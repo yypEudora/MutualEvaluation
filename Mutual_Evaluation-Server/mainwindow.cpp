@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     m_mysql.connect_mysql(); //连接数据库
     m_mysql.create_database();     //打开数据库，不存在时则创建
-    //m_mysql.init_database();       //初始化数据库
+    m_mysql.init_database();       //初始化数据库
     m_server_status = 0;    //初始服务器状态为关闭
     this->m_tcpServer = nullptr;
     this->m_tcpSocket = nullptr;
