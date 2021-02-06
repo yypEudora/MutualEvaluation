@@ -102,19 +102,20 @@ void MainWindow::read_messages(){
 
 
     QString sender;
+    QString current_user;
     QJsonDocument doucment;
-    get_sender_info(send_buf,sender);//获取发送者信息
+    get_sender_info(send_buf,sender, current_user);//获取发送者信息
 
     qDebug()<<"sender是："<<sender;
 
     //判断需要处理的事件
     if(sender=="login"){
-        read_login_messages(send_buf);
-        qDebug()<<"处理登录...";
+        read_login_messages(send_buf, current_user);
+        qDebug()<<current_user<<"处理登录...";
     }
     else if(sender=="register"){
-        read_regist_messages(send_buf);
-        qDebug()<<"处理注册...";
+        read_regist_messages(send_buf, current_user);
+        qDebug()<<current_user<<"处理注册...";
     }
 
 }
@@ -122,36 +123,36 @@ void MainWindow::read_messages(){
 
 /**
  * @brief MainWindow::read_login_messages 此时已经知道进行登录服务，调用登录服务的操作
- * @param send_buf 客户端发送过来的数据
+ * @param send_buf，current_user 客户端发送过来的数据，当前哪种用户请求登录
  */
-void MainWindow::read_login_messages(QByteArray send_buf)
+void MainWindow::read_login_messages(QByteArray send_buf, QString current_user)
 {
 //    m_deal_login = new DealLogin{m_tcpSocket, m_mysql};
 //    m_deal_login->read_login_messages(send_buf);
 //    delete(m_deal_login);
     DealLogin deal_login{m_tcpSocket, m_mysql};
-    deal_login.read_login_messages(send_buf);
+    deal_login.read_login_messages(send_buf, current_user);
 }
 
 
 /**
  * @brief MainWindow::read_regist_messages 此时已经知道进行注册服务，调用注册服务的操作
- * @param send_buf 客户端发送过来的数据
+ * @param send_buf，current_user 客户端发送过来的数据，当前哪种用户请求注册
  */
-void MainWindow::read_regist_messages(QByteArray send_buf){
+void MainWindow::read_regist_messages(QByteArray send_buf, QString current_user){
 //    m_deal_regist = new DealRegist{m_tcpSocket, m_mysql};
 //    m_deal_regist->read_regist_messages(send_buf);
 //    delete(m_deal_regist);
     DealRegist deal_regist{m_tcpSocket, m_mysql};
-    deal_regist.read_regist_messages(send_buf);
+    deal_regist.read_regist_messages(send_buf, current_user);
 }
 
 
 /**
  * @brief MainWindow::get_sender_info 解析客户端发送过来的json包
- * @param send_buf, sender 用以保存客户端发送数据的缓冲区，发送者(请求什么服务)
+ * @param send_buf, sender, current_user 用以保存客户端发送数据的缓冲区，发送者(请求什么服务), 当前用户(学生/教师/助教)
  */
-void MainWindow::get_sender_info(QByteArray send_buf,QString &sender)
+void MainWindow::get_sender_info(QByteArray send_buf,QString &sender, QString &current_user)
 {
         /*json数据如下
         {
@@ -169,6 +170,12 @@ void MainWindow::get_sender_info(QByteArray send_buf,QString &sender)
                 QJsonValue value = object.value("sender");  // 获取指定 key 对应的 value
                 if (value.isString()) {  // 判断 value 是否为字符串
                     sender = value.toString();  // 将 value 转化为字符串
+                }
+            }
+            if (object.contains("current_user")) {  // 包含指定的 key
+                QJsonValue value = object.value("current_user");  // 获取指定 key 对应的 value
+                if (value.isString()) {  // 判断 value 是否为字符串
+                    current_user = value.toString();  // 将 value 转化为字符串
                 }
             }
         }

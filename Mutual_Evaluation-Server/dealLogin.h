@@ -11,7 +11,7 @@ public:
     DealLogin(QTcpSocket *tcpSocket, MYSQL mysql);
     ~DealLogin();
 
-    void read_login_messages(QByteArray send_buf);
+    void read_login_messages(QByteArray send_buf, QString current_user);
     void send_login_back_messages(QByteArray postData);
     QByteArray set_login_back_json(QString msg);
 

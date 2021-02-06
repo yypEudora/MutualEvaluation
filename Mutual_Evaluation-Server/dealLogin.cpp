@@ -24,9 +24,9 @@ DealLogin::~DealLogin(){
 
 /**
  * @brief DealLogin::read_login_messages 获取想要登录的用户信息
- * @param send_buf 客户端传过来的数据
+ * @param send_buf,current_user 客户端传过来的数据，当前请求登录操作的用户类别
  */
-void DealLogin::read_login_messages(QByteArray send_buf)
+void DealLogin::read_login_messages(QByteArray send_buf, QString current_user)
 {
     QByteArray log_buf = send_buf;
     //获取登录信息
@@ -36,8 +36,8 @@ void DealLogin::read_login_messages(QByteArray send_buf)
 
     QString msg; //用于判断是否登录成功
     //this->setWindowTitle(msg);
-    if(this->m_mysql.user_is_exist(user)) { //用户存在
-        if(m_mysql.password_is_correct(user,pwd)){  //密码正确
+    if(this->m_mysql.user_is_exist(current_user, user)) { //用户存在
+        if(m_mysql.password_is_correct(current_user, user, pwd)){  //密码正确
             msg = "true";
         }
         else msg = "PasswordWrong";
