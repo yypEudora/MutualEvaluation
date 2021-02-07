@@ -23,7 +23,7 @@ public:
     ~MainWindow();
     QString get_local_ip_address(); //获取本机ip地址
     void init_server_connect();   //连接/关闭服务器
-    void get_sender_info(QByteArray send_buf,QString &sender);//确认请求处理的事件
+    void get_sender_info(QByteArray send_buf,QString &sender, QString &current_user);//确认请求处理的事件和请求的用户
 
 private slots:
     void start_tcp_server();  //开启服务器
@@ -31,8 +31,8 @@ private slots:
 
     void new_connect();
     void read_messages();
-    void read_login_messages(QByteArray send_buf);
-    void read_regist_messages(QByteArray send_buf);
+    void read_login_messages(QByteArray send_buf, QString current_user);
+    void read_regist_messages(QByteArray send_buf, QString current_user);
 
 
 private:
