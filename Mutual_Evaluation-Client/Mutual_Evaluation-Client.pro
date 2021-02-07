@@ -1,5 +1,4 @@
-QT       += core gui
-QT += network
+QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -16,19 +15,33 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    common/common.cpp \
+    common/des.cpp \
     login.cpp \
     main.cpp \
-    titlewg.cpp
+    student/stu_mainwindow.cpp \
+    teacher/tc_mainwindow.cpp \
+    titlewg.cpp \
+    zhujiao/zj_mainwindow.cpp
 
 HEADERS += \
+    common/common.h \
+    common/des.h \
     login.h \
-    titlewg.h
+    student/stu_mainwindow.h \
+    teacher/tc_mainwindow.h \
+    titlewg.h \
+    zhujiao/zj_mainwindow.h
 
 FORMS += \
     login.ui \
-    titlewg.ui
+    student/stu_mainwindow.ui \
+    teacher/tc_mainwindow.ui \
+    titlewg.ui \
+    zhujiao/zj_mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+LIBS += -L/usr/local/lib -lhiredis
