@@ -26,10 +26,7 @@ void DealRegist::read_regist_messages(QByteArray send_buf, QString current_user)
     QByteArray reg_buf = send_buf;
     //获取注册信息
     QString user;
-    QString nick_name;
     QString pwd;
-    QString phone;
-    QString email;
     get_regist_info(reg_buf,user, pwd);
 
     QString msg; //用于判断是否注册成功
@@ -71,8 +68,8 @@ void DealRegist::get_regist_info(QByteArray reg_buf,QString &user, QString &pwd)
                     user = value.toString();  // 将 value 转化为字符串
                 }
             }
-            if (object.contains("firstPwd")) {
-                QJsonValue value = object.value("firstPwd");
+            if (object.contains("pwd")) {
+                QJsonValue value = object.value("pwd");
                 if (value.isString()) {
                     pwd = value.toString();
                 }

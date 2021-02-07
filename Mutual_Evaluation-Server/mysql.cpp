@@ -217,11 +217,11 @@ void MYSQL::regist_success(QString current_user, QString user, QString pwd)
     if(current_user == "student")   //学生注册
         cmd ="insert into Student_Info values('"+user+"','"+pwd+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"',"+"0"+",'"+"false"+"')";
     else if(current_user == "teacher") //教师注册
-        //QString cmd ="insert into Teacher_Info values('"+user+"','"+pwd+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"',"+"0"+",'"+"false"+"')";
-        cmd = "";
+        cmd ="insert into Teacher_Info values('"+user+"','"+pwd+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"',"+"0"+",'"+"false"+"')";
+
     else if(current_user == "zhujiao")  //助教注册
-        //QString cmd ="insert into Teacher_Info values('"+user+"','"+pwd+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"',"+"0"+",'"+"false"+"')";
-         cmd = "";
+        cmd ="insert into Zhujiao_Info values('"+user+"','"+pwd+"','"+""+"','"+"" +"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+"false"+"')";
+
 
 
 
@@ -232,7 +232,7 @@ void MYSQL::regist_success(QString current_user, QString user, QString pwd)
     if(!query.exec())
     {
         qDebug()<<"增加错误！！";
-        qDebug() << "Error: Fail to insert in [Mutual_Evaluation].[Student_Info]." << query.lastError();
+        qDebug() << "Error: Fail to insert in [Mutual_Evaluation].[xxxx_Info]." << query.lastError();
 
     }
 }
