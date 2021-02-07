@@ -11,7 +11,7 @@ zj_mainwindow::zj_mainwindow(QWidget *parent) :
 
 
     // 处理所有信号
-    managerSignals();
+    manager_signals();
 }
 
 zj_mainwindow::~zj_mainwindow()
@@ -19,13 +19,13 @@ zj_mainwindow::~zj_mainwindow()
     delete ui;
 }
 
-void zj_mainwindow::showMainWindow()
+void zj_mainwindow::show_mainwindow()
 {
     this->show();
 }
 
 
-void zj_mainwindow::managerSignals()
+void zj_mainwindow::manager_signals()
 {
     // 切换用户
     connect(ui->change_user_btn, &QToolButton::clicked, [=]()
@@ -41,7 +41,7 @@ void zj_mainwindow::managerSignals()
       else if (choose== QMessageBox::Yes)
       {
         cout << "bye bye...";
-        loginAgain(); //程序退出
+        login_again(); //程序退出
       }
 
     });
@@ -49,8 +49,8 @@ void zj_mainwindow::managerSignals()
 
 }
 
-void zj_mainwindow::loginAgain()
+void zj_mainwindow::login_again()
 {
     this->hide();
-    emit changeUser();
+    emit change_user();
 }

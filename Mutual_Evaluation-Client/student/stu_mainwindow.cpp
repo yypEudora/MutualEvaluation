@@ -10,7 +10,7 @@ stu_mainwindow::stu_mainwindow(QWidget *parent) :
     ui->setupUi(this);
 
     // 处理所有信号
-    managerSignals();
+    manager_signals();
 }
 
 stu_mainwindow::~stu_mainwindow()
@@ -20,13 +20,13 @@ stu_mainwindow::~stu_mainwindow()
 
 
 
-void stu_mainwindow::showMainWindow()
+void stu_mainwindow::show_mainwindow()
 {
     this->show();
 }
 
 
-void stu_mainwindow::managerSignals()
+void stu_mainwindow::manager_signals()
 {
     // 切换用户
     connect(ui->change_user_btn, &QToolButton::clicked, [=]()
@@ -42,7 +42,7 @@ void stu_mainwindow::managerSignals()
       else if (choose== QMessageBox::Yes)
       {
         cout << "bye bye...";
-        loginAgain(); //程序退出
+        login_again(); //程序退出
       }
 
     });
@@ -50,9 +50,9 @@ void stu_mainwindow::managerSignals()
 
 }
 
-void stu_mainwindow::loginAgain()
+void stu_mainwindow::login_again()
 {
     this->hide();
-    emit changeUser();
+    emit change_user();
 
 }

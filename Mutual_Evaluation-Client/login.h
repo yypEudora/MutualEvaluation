@@ -26,18 +26,18 @@ public:
     ~Login();
 
     // 设置登陆用户信息的json包
-    QByteArray setLoginJson(QString current_user, QString user, QString pwd);
+    QByteArray set_login_json(QString current_user, QString user, QString pwd);
 
     // 设置注册用户信息的json包
-    QByteArray setRegisterJson(QString current_user, QString user,QString pwd);
+    QByteArray set_register_json(QString current_user, QString user,QString pwd);
 
     //得到服务器处理登录后的返回码
-    QStringList getLoginStatus(QByteArray json);
+    QStringList get_login_status(QByteArray json);
 
-    void GetBackJson(QByteArray &back_buf, QString &sender,QString &msg); //解析返回的json数据包
+    void get_back_json(QByteArray &back_buf, QString &sender,QString &msg); //解析返回的json数据包
 
-    QString getLoginCurrentUser();  //得到当前请求登录的用户类别
-    QString getRegistCurrentUser(); //得到当前请求注册的用户类别
+    QString get_login_current_user();  //得到当前请求登录的用户类别
+    QString get_regist_current_user(); //得到当前请求注册的用户类别
 
 
 protected: 
@@ -55,9 +55,9 @@ private slots:
     void on_reg_btn_clicked();
     void on_set2_btn_clicked();
 
-    void readBackMessage(); //读取返回信息
-    void readLoginBackMessages(QString msg);//读取返回登录信息槽函数；
-    void readRegistBackMessages(QString msg);//读取注册返回信息
+    void read_back_message(); //读取返回信息
+    void read_login_back_messages(QString msg);//读取返回登录信息槽函数；
+    void read_regist_back_messages(QString msg);//读取注册返回信息
 
 private:
     Ui::Login *ui;
