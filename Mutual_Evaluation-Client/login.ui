@@ -1581,6 +1581,9 @@ border-right-width:0px;
 border-bottom-width:2px;
 border-left-width:0px;</string>
             </property>
+            <property name="text">
+             <string>8888</string>
+            </property>
            </widget>
           </item>
           <item row="5" column="2">
@@ -1657,6 +1660,9 @@ border-top-width:0px;
 border-right-width:0px;
 border-bottom-width:2px;
 border-left-width:0px;</string>
+            </property>
+            <property name="text">
+             <string>192.168.1.7</string>
             </property>
            </widget>
           </item>
