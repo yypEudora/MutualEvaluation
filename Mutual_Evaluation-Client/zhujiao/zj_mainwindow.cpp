@@ -3,9 +3,9 @@
 #include <QMessageBox>
 #include <QToolButton>
 
-zj_mainwindow::zj_mainwindow(QWidget *parent) :
+Zj_mainwindow::Zj_mainwindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::zj_mainwindow)
+    ui(new Ui::Zj_mainwindow)
 {
     ui->setupUi(this);
 
@@ -14,18 +14,18 @@ zj_mainwindow::zj_mainwindow(QWidget *parent) :
     manager_signals();
 }
 
-zj_mainwindow::~zj_mainwindow()
+Zj_mainwindow::~Zj_mainwindow()
 {
     delete ui;
 }
 
-void zj_mainwindow::show_mainwindow()
+void Zj_mainwindow::show_mainwindow()
 {
     this->show();
 }
 
 
-void zj_mainwindow::manager_signals()
+void Zj_mainwindow::manager_signals()
 {
     // 切换用户
     connect(ui->change_user_btn, &QToolButton::clicked, [=]()
@@ -49,7 +49,7 @@ void zj_mainwindow::manager_signals()
 
 }
 
-void zj_mainwindow::login_again()
+void Zj_mainwindow::login_again()
 {
     this->hide();
     emit change_user();

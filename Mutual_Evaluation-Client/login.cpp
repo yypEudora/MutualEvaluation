@@ -26,13 +26,14 @@ Login::Login(QWidget *parent)
 
     m_parent = parent;
     // 此处无需指定父窗口
-    m_stu_mainwindow = new stu_mainwindow;
-    m_tc_mainwindow = new tc_mainwindow;
-    m_zj_mainwindow = new zj_mainwindow;
+    m_stu_mainwindow = new Stu_Mainwindow;
+    m_tc_mainwindow = new Tc_Mainwindow;
+    m_zj_mainwindow = new Zj_mainwindow;
 
 
     //去掉创建的边框
     this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
+
     ui->stackedWidget->setCurrentWidget(ui->login_page);
     setAutoFillBackground(true);
 
@@ -46,6 +47,9 @@ Login::Login(QWidget *parent)
     manage_format();
     //信号槽管理
     manage_signals();
+
+    //设置软件图标
+    this->setWindowIconText("ME");
 }
 
 Login::~Login()
@@ -116,19 +120,19 @@ void Login::manage_signals()
     });
 
     // 学生主界面切换用户 - 重新登录
-    connect(m_stu_mainwindow, &stu_mainwindow::change_user, [=]()
+    connect(m_stu_mainwindow, &Stu_Mainwindow::change_user, [=]()
     {
         m_stu_mainwindow->hide();
         this->show();
     });
     // 教师主界面切换用户 - 重新登录
-    connect(m_tc_mainwindow, &tc_mainwindow::change_user, [=]()
+    connect(m_tc_mainwindow, &Tc_Mainwindow::change_user, [=]()
     {
         m_stu_mainwindow->hide();
         this->show();
     });
     // 助教主界面切换用户 - 重新登录
-    connect(m_zj_mainwindow, &zj_mainwindow::change_user, [=]()
+    connect(m_zj_mainwindow, &Zj_mainwindow::change_user, [=]()
     {
         m_stu_mainwindow->hide();
         this->show();
@@ -288,6 +292,7 @@ void Login::on_login_btn_clicked()
         qDebug()<<suc;
         this->tcpSocket->write(postData,postData.length());//发送登录数据包
         qDebug()<<"发送数据包";
+
 }
 
 

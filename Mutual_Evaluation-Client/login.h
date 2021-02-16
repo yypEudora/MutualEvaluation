@@ -69,9 +69,9 @@ private:
 
     Common m_cm;
     QWidget *m_parent;  // 父窗口指针
-    stu_mainwindow* m_stu_mainwindow; //学生主界面指针
-    tc_mainwindow* m_tc_mainwindow; //教师主界面指针
-    zj_mainwindow* m_zj_mainwindow; //助教主界面指针
+    Stu_Mainwindow* m_stu_mainwindow; //学生主界面指针
+    Tc_Mainwindow* m_tc_mainwindow; //教师主界面指针
+    Zj_mainwindow* m_zj_mainwindow; //助教主界面指针
 
 
 };
