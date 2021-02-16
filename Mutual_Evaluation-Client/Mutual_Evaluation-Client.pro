@@ -19,7 +19,9 @@ SOURCES += \
     common/des.cpp \
     login.cpp \
     main.cpp \
+    student/stu_info.cpp \
     student/stu_mainwindow.cpp \
+    teacher/tc_info.cpp \
     teacher/tc_mainwindow.cpp \
     titlewg.cpp \
     zhujiao/zj_mainwindow.cpp
@@ -28,14 +30,18 @@ HEADERS += \
     common/common.h \
     common/des.h \
     login.h \
+    student/stu_info.h \
     student/stu_mainwindow.h \
+    teacher/tc_info.h \
     teacher/tc_mainwindow.h \
     titlewg.h \
     zhujiao/zj_mainwindow.h
 
 FORMS += \
     login.ui \
+    student/stu_info.ui \
     student/stu_mainwindow.ui \
+    teacher/tc_info.ui \
     teacher/tc_mainwindow.ui \
     titlewg.ui \
     zhujiao/zj_mainwindow.ui

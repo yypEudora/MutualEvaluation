@@ -26,13 +26,14 @@ Login::Login(QWidget *parent)
 
     m_parent = parent;
     // 此处无需指定父窗口
-    m_stu_mainwindow = new stu_mainwindow;
-    m_tc_mainwindow = new tc_mainwindow;
-    m_zj_mainwindow = new zj_mainwindow;
+    m_stu_mainwindow = new Stu_Mainwindow;
+    m_tc_mainwindow = new Tc_Mainwindow;
+    m_zj_mainwindow = new Zj_mainwindow;
 
 
     //去掉创建的边框
     this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
+
     ui->stackedWidget->setCurrentWidget(ui->login_page);
     setAutoFillBackground(true);
 
@@ -46,8 +47,20 @@ Login::Login(QWidget *parent)
     manage_format();
     //信号槽管理
     manage_signals();
+
+    //设置软件图标
+    this->setWindowIconText("ME");
 }
 
+Login::~Login()
+{
+    delete ui;
+}
+
+
+/**
+ * @brief Login::manage_format 设置需要输入的数据的正确格式
+ */
 void Login::manage_format(){
     // 数据的格式提示
     ui->stu_id_tx->setToolTip("合法字符:[a-z|A-Z|#|@|0-9|-|_|*],字符个数: 3~16");
@@ -61,6 +74,10 @@ void Login::manage_format(){
 
 }
 
+
+/**
+ * @brief Login::manage_signals 设置信号槽连接
+ */
 void Login::manage_signals()
 {
     //登录界面点击设置，进入服务器IP和端口界面
@@ -103,29 +120,25 @@ void Login::manage_signals()
     });
 
     // 学生主界面切换用户 - 重新登录
-    connect(m_stu_mainwindow, &stu_mainwindow::changeUser, [=]()
+    connect(m_stu_mainwindow, &Stu_Mainwindow::change_user, [=]()
     {
         m_stu_mainwindow->hide();
         this->show();
     });
     // 教师主界面切换用户 - 重新登录
-    connect(m_tc_mainwindow, &tc_mainwindow::changeUser, [=]()
+    connect(m_tc_mainwindow, &Tc_Mainwindow::change_user, [=]()
     {
         m_stu_mainwindow->hide();
         this->show();
     });
     // 助教主界面切换用户 - 重新登录
-    connect(m_zj_mainwindow, &zj_mainwindow::changeUser, [=]()
+    connect(m_zj_mainwindow, &Zj_mainwindow::change_user, [=]()
     {
         m_stu_mainwindow->hide();
         this->show();
     });
 }
 
-Login::~Login()
-{
-    delete ui;
-}
 
 void Login::mousePressEvent(QMouseEvent *event)
 {
@@ -149,8 +162,11 @@ void Login::mouseMoveEvent(QMouseEvent *event)
         move(event->pos() - m_pt + pos());
 }
 
-//得到当前请求登录的用户类别
-QString Login::getLoginCurrentUser()
+
+/**
+ * @brief Login::get_login_current_user 得到当前请求登录的用户类别
+ */
+QString Login::get_login_current_user()
 {
     QString current_user;
     if(ui->student_btn->isChecked())
@@ -163,8 +179,10 @@ QString Login::getLoginCurrentUser()
 }
 
 
-//得到当前请求注册的用户类别
-QString Login::getRegistCurrentUser()
+/**
+ * @brief Login::get_regist_current_user 得到当前请求注册的用户类别
+ */
+QString Login::get_regist_current_user()
 {
     QString current_user;
     if(ui->student_box->isChecked())
@@ -177,9 +195,12 @@ QString Login::getRegistCurrentUser()
 }
 
 
-
-// 登陆用户需要使用的json数据包
-QByteArray Login::setLoginJson(QString current_user, QString user, QString pwd)
+/**
+ * @brief Login::set_login_json 登陆用户需要使用的json数据包，发送给服务端
+ * @param current_user, user, pwd  当前用户类别，用户，密码
+ * @return 设置好的json数据包
+ */
+QByteArray Login::set_login_json(QString current_user, QString user, QString pwd)
 {
     QMap<QString, QVariant> login;
     login.insert("sender","login");
@@ -207,8 +228,13 @@ QByteArray Login::setLoginJson(QString current_user, QString user, QString pwd)
     return jsonDocument.toJson();
 }
 
-// 注册用户需要使用的json数据包
-QByteArray Login::setRegisterJson(QString current_user, QString user, QString pwd)
+
+/**
+ * @brief Login::set_register_json 注册用户需要使用的json数据包，发送给服务端
+ * @param current_user, user, pwd  当前用户类别，用户，密码
+ * @return 设置好的json数据包
+ */
+QByteArray Login::set_register_json(QString current_user, QString user, QString pwd)
 {
     QMap<QString, QVariant> reg;
     reg.insert("sender","register");
@@ -231,11 +257,13 @@ QByteArray Login::setRegisterJson(QString current_user, QString user, QString pw
 }
 
 
-//确认登录
+/**
+ * @brief Login::on_login_btn_clicked 确认登录
+ */
 void Login::on_login_btn_clicked()
 {
 
-    QString current_user = getLoginCurrentUser();
+    QString current_user = get_login_current_user();
     cout<<current_user<<"请求登录啦";
     // 从控件中取出用户输入的数据
     QString user = ui->name_tx->text();
@@ -253,24 +281,27 @@ void Login::on_login_btn_clicked()
 
 
     // 将用户输入的注册信息 -> json对象
-        QByteArray postData = setLoginJson(current_user, user, m_cm.getStrMd5(pwd));
+        QByteArray postData = set_login_json(current_user, user, m_cm.getStrMd5(pwd));
 
         this->tcpSocket = new QTcpSocket(this);
         this->tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
                                     //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
         this->tcpSocket->connectToHost(ip,8888);
-        connect(this->tcpSocket,SIGNAL(readyRead()),this,SLOT(readBackMessage()));
+        connect(this->tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_message()));
         bool suc = this->tcpSocket->waitForConnected();
         qDebug()<<suc;
         this->tcpSocket->write(postData,postData.length());//发送登录数据包
         qDebug()<<"发送数据包";
+
 }
 
 
-//确认注册
+/**
+ * @brief Login::on_reg_btn_clicked 确认注册
+ */
 void Login::on_reg_btn_clicked()
 {
-    QString current_user = getRegistCurrentUser();
+    QString current_user = get_regist_current_user();
 
     QString user;
     QString firstPwd;
@@ -352,16 +383,14 @@ void Login::on_reg_btn_clicked()
     }
 
 
-
-
     // 将用户输入的注册信息 -> json对象
-        QByteArray postData = setRegisterJson(current_user,user, m_cm.getStrMd5(firstPwd));
+        QByteArray postData = set_register_json(current_user,user, m_cm.getStrMd5(firstPwd));
 
         this->tcpSocket = new QTcpSocket(this);
         this->tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
                                     //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
         this->tcpSocket->connectToHost(ip,8888);
-        connect(this->tcpSocket,SIGNAL(readyRead()),this,SLOT(readBackMessage()));
+        connect(this->tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_message()));
         bool suc = this->tcpSocket->waitForConnected();
         qDebug()<<suc;
         this->tcpSocket->write(postData,postData.length());//发送登录数据包
@@ -369,7 +398,10 @@ void Login::on_reg_btn_clicked()
 }
 
 
-//确认设置
+/**
+ * @brief Login::on_set2_btn_clicked 确认设置
+ */
+
 void Login::on_set2_btn_clicked()
 {
     QString ip = ui->ip_tx->text();
@@ -393,8 +425,11 @@ void Login::on_set2_btn_clicked()
 }
 
 
-//读取服务端登录/注册结果反馈信息
-void Login::readBackMessage(){
+/**
+ * @brief Login::read_back_message 读取服务端登录/注册结果反馈信息
+ */
+void Login::read_back_message()
+{
     QByteArray alldata = this->tcpSocket->readAll();
     QByteArray back_buf = alldata;
     qDebug()<<"back_buf:"<<back_buf;
@@ -403,36 +438,41 @@ void Login::readBackMessage(){
     //获取事件处理的返回信息
     QString sender;
     QString msg;
-    GetBackJson(back_buf,sender,msg);
+    get_back_json(back_buf,sender,msg);
 
     if(sender == "login"){
-        readLoginBackMessages(msg);
+        read_login_back_messages(msg);
     }
     else if(sender == "register"){
-        readRegistBackMessages(msg);
+        read_regist_back_messages(msg);
     }
 }
 
-void Login::readLoginBackMessages(QString msg)
+
+/**
+ * @brief Login::read_login_back_messages 读取服务端登录结果的反馈信息
+ * @param msg 登录结果的反馈信息
+ */
+void Login::read_login_back_messages(QString msg)
 {
     qDebug()<<"msg2是："<<msg;
     if(msg == "true") {
         this->hide();
-        QString current_user = getLoginCurrentUser();
+        QString current_user = get_login_current_user();
 
          //判断登录成功后显示哪种类别的主界面
         if(current_user == "student"){
             cout<<"学生正在登录...";
             //LoginInfoInstance *p = LoginInfoInstance::getInstance(); //获取单例
-            m_stu_mainwindow->showMainWindow(); //显示学生主界面
+            m_stu_mainwindow->show_mainwindow(); //显示学生主界面
         }
         else if(current_user == "teacher"){
             cout<<"教师正在登录...";
-            m_tc_mainwindow->showMainWindow(); //显示教师主界面
+            m_tc_mainwindow->show_mainwindow(); //显示教师主界面
         }
         else if(current_user == "zhujiao"){
             cout<<"助教正在登录...";
-            m_zj_mainwindow->showMainWindow(); //显示助教主界面
+            m_zj_mainwindow->show_mainwindow(); //显示助教主界面
         }
 
     }
@@ -449,7 +489,12 @@ void Login::readLoginBackMessages(QString msg)
     }
 }
 
-void Login::readRegistBackMessages(QString msg)
+
+/**
+ * @brief Login::read_regist_back_messages 读取服务端注册结果的反馈信息
+ * @param msg 注册结果的反馈信息
+ */
+void Login::read_regist_back_messages(QString msg)
 {
 
     qDebug()<<"msg2是："<<msg;
@@ -468,8 +513,12 @@ void Login::readRegistBackMessages(QString msg)
     }
 }
 
-//解析注册/登录反馈信息json包
-void Login::GetBackJson(QByteArray &back_buf, QString &sender,QString &msg)
+
+/**
+ * @brief Login::get_back_json 解析注册/登录反馈信息json包
+ * @param back_buf, sender, msg 整个反馈信息的缓冲区，服务端的发送者，服务成功与否的反馈信息
+ */
+void Login::get_back_json(QByteArray &back_buf, QString &sender,QString &msg)
 {
         /*json数据如下
         {
@@ -500,8 +549,9 @@ void Login::GetBackJson(QByteArray &back_buf, QString &sender,QString &msg)
     qDebug()<<"返回的信息包："<<sender<<" "<<msg;
 }
 
+
 //获取登录返回码
-QStringList Login::getLoginStatus(QByteArray json)
+QStringList Login::get_login_status(QByteArray json)
 {
     QJsonParseError error;
     QStringList list;
