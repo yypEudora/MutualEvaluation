@@ -125,14 +125,17 @@ bool MYSQL::user_is_exist(QString current_user, QString user)
     connect_mysql();
     //createDB();
     QSqlQuery query(m_database);
-
+    QString cmd;
 
     if(current_user == "student")
-        query.exec("select * from Student_Info");
+        cmd ="select * from Student_Info where Id='"+user+"'";
     else if(current_user == "teacher")
-        query.exec("select * from Teacher_Info");
+        cmd = "select * from Teacher_Info where Id='"+user+"'";
     else if(current_user == "zhujiao")
-        query.exec("select * from Zhujiao_Info");
+        cmd = "select * from Zhujiao_Info where Id='"+user+"'";
+
+    qDebug()<<"命令是" << cmd;
+    query.exec(cmd);
 
     char token[128] = {0};
 
@@ -168,13 +171,17 @@ bool MYSQL::password_is_correct(QString current_user, QString user, QString pwd)
     connect_mysql();
     //createDB();
     QSqlQuery query(m_database);
+    QString cmd;
 
     if(current_user == "student")
-        query.exec("select * from Student_Info");
+        cmd ="select * from Student_Info where Id='"+user+"'";
     else if(current_user == "teacher")
-        query.exec("select * from Teacher_Info");
+        cmd = "select * from Teacher_Info where Id='"+user+"'";
     else if(current_user == "zhujiao")
-        query.exec("select * from Zhujiao_Info");
+        cmd = "select * from Zhujiao_Info where Id='"+user+"'";
+
+    qDebug()<<"命令是" << cmd;
+    query.exec(cmd);
 
     char token[128] = {0};
 
@@ -222,9 +229,6 @@ void MYSQL::regist_success(QString current_user, QString user, QString pwd)
     else if(current_user == "zhujiao")  //助教注册
         cmd ="insert into Zhujiao_Info values('"+user+"','"+pwd+"','"+""+"','"+"" +"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+""+"','"+"false"+"')";
 
-
-
-
     qDebug()<<"命令是" << cmd;
     query.exec(cmd);
 
@@ -235,6 +239,100 @@ void MYSQL::regist_success(QString current_user, QString user, QString pwd)
         qDebug() << "Error: Fail to insert in [Mutual_Evaluation].[xxxx_Info]." << query.lastError();
 
     }
+}
+
+
+
+void MYSQL::init_user_data(QString current_user, QString user, QString &pwd, QString &name, QString &sex,
+                    QString &academy, QString &grade, QString &major, QString &clas,
+                    QString &tell, QString &qq, int &course_number, bool &completed_info)
+{
+    connect_mysql();
+    QSqlQuery query(m_database);
+    QString cmd;
+
+
+    if(current_user == "student")
+        cmd ="select * from Student_Info where Id='"+user+"'";
+    else if(current_user == "teacher")
+        cmd = "select * from Teacher_Info where Id='"+user+"'";
+    else if(current_user == "zhujiao")
+        cmd = "select * from Zhujiao_Info where Id='"+user+"'";
+
+    qDebug()<<"命令是" << cmd;
+    query.exec(cmd);
+
+    while(query.next()) {
+        pwd = query.value(1).toString();
+        name = query.value(2).toString();
+        sex = query.value(3).toString();
+        academy = query.value(4).toString();
+        grade = query.value(5).toString();
+        major = query.value(6).toString();
+        clas = query.value(7).toString();
+        tell = query.value(8).toString();
+        qq = query.value(9).toString();
+        course_number = query.value(10).toInt();
+        completed_info = query.value(11).toBool();
+    }
+}
+
+
+
+//测试使用，数据库命令需要改进
+void MYSQL::save_user_info(QString current_user, QString user, QString name, QString sex,
+                           QString academy, QString grade, QString major, QString clas,
+                           QString tell, QString qq, bool completed_info)
+{
+    connect_mysql();
+    QSqlQuery query(m_database);
+    QString cmd;
+    QString cmd1;
+    QString cmd2;
+    QString cmd3;
+    QString cmd4;
+    QString cmd5;
+    QString cmd6;
+    QString cmd7;
+    QString cmd8;
+    QString if_completed;//数据表中是以vchar类型存储的
+    if(completed_info)
+        if_completed = "true";
+    else
+        if_completed = "false";
+
+
+
+    if(current_user == "student"){
+        cmd = "update Student_Info set Name='"+name+"' where Id='"+user+"'";
+        cmd1 = "update Student_Info set Sex='"+sex+"' where Id='"+user+"'";
+        cmd2 = "update Student_Info set Academy='"+academy+"' where Id='"+user+"'";
+        cmd3 = "update Student_Info set Grade='"+grade+"' where Id='"+user+"'";
+        cmd4 = "update Student_Info set Major='"+major+"' where Id='"+user+"'";
+        cmd5 = "update Student_Info set Class='"+clas+"' where Id='"+user+"'";
+        cmd6 = "update Student_Info set Tell='"+tell+"' where Id='"+user+"'";
+        cmd7 = "update Student_Info set QQ='"+qq+"' where Id='"+user+"'";
+        cmd8 = "update Student_Info set IfCompleteInfo='"+if_completed+"' where Id='"+user+"'";
+
+        //cmd = "update Student_Info set Name='"+name+"',Sex='"+sex+"',Academy='"+academy+"',Grade='"+grade+"',Major='"+major+"',Class='"+clas+"',Tell='"+tell+"',QQ='"+qq+"',IfCompletedInfo='"+if_complete+"'"+" where Id='"+user+"'";
+        //cmd = "update Student_Info set 'Name'='"+name+"','Sex'='"+sex+"','Academy'='"+academy+"','Grade'='"+grade+"','Major'='"+major+"','Class'='"+clas+"','Tell'='"+tell+"','QQ'='"+qq+"','IfCompletedInfo'='"+if_complete+"'"+" where Id='"+user+"'";
+        //cmd="update Student_Info set 'Name'='"+name;
+    }
+    else if(current_user == "teacher")
+        cmd = "select * from Teacher_Info where Id='"+user+"'";
+    else if(current_user == "zhujiao")
+        cmd = "select * from Zhujiao_Info where Id='"+user+"'";
+
+    qDebug()<<"命令是" << cmd;
+    query.exec(cmd);
+    query.exec(cmd1);
+    query.exec(cmd2);
+    query.exec(cmd3);
+    query.exec(cmd4);
+    query.exec(cmd5);
+    query.exec(cmd6);
+    query.exec(cmd7);
+    query.exec(cmd8);
 }
 
 

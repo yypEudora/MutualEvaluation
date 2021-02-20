@@ -7,8 +7,6 @@
 #include <QHostInfo>
 #include <QSqlDatabase>
 #include "mysql.h"
-#include "dealRegist.h"
-#include "dealLogin.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,7 +31,7 @@ private slots:
     void read_messages();
     void read_login_messages(QByteArray send_buf, QString current_user);
     void read_regist_messages(QByteArray send_buf, QString current_user);
-
+    void read_student_messages(QByteArray send_buf);
 
 private:
     Ui::MainWindow *ui;

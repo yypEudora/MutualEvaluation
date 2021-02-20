@@ -6,6 +6,9 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QtSql>
+#include "dealRegist.h"
+#include "dealLogin.h"
+#include "student/stu_main.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -117,7 +120,11 @@ void MainWindow::read_messages(){
         read_regist_messages(send_buf, current_user);
         qDebug()<<current_user<<"处理注册...";
     }
+    else if(sender == "student"){
+        read_student_messages(send_buf);
+        qDebug() <<"处理学生请求的服务";
 
+    }
 }
 
 
@@ -127,9 +134,6 @@ void MainWindow::read_messages(){
  */
 void MainWindow::read_login_messages(QByteArray send_buf, QString current_user)
 {
-//    m_deal_login = new DealLogin{m_tcpSocket, m_mysql};
-//    m_deal_login->read_login_messages(send_buf);
-//    delete(m_deal_login);
     DealLogin deal_login{m_tcpSocket, m_mysql};
     deal_login.read_login_messages(send_buf, current_user);
 }
@@ -140,12 +144,16 @@ void MainWindow::read_login_messages(QByteArray send_buf, QString current_user)
  * @param send_buf，current_user 客户端发送过来的数据，当前哪种用户请求注册
  */
 void MainWindow::read_regist_messages(QByteArray send_buf, QString current_user){
-//    m_deal_regist = new DealRegist{m_tcpSocket, m_mysql};
-//    m_deal_regist->read_regist_messages(send_buf);
-//    delete(m_deal_regist);
     DealRegist deal_regist{m_tcpSocket, m_mysql};
     deal_regist.read_regist_messages(send_buf, current_user);
 }
+
+//响应学生用户类别请求的服务
+void MainWindow::read_student_messages(QByteArray send_buf){
+    Stu_Main stu_main{m_tcpSocket, m_mysql};
+    stu_main.read_service_messages(send_buf);
+}
+
 
 
 /**

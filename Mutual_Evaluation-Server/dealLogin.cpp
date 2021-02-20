@@ -35,14 +35,15 @@ void DealLogin::read_login_messages(QByteArray send_buf, QString current_user)
     get_login_info(log_buf,user,pwd);
 
     QString msg; //用于判断是否登录成功
+
     //this->setWindowTitle(msg);
     if(this->m_mysql.user_is_exist(current_user, user)) { //用户存在
         if(m_mysql.password_is_correct(current_user, user, pwd)){  //密码正确
-            msg = "true";
+            msg = "true";                  //可以进行登录
         }
-        else msg = "PasswordWrong";
-    } else {                               //用户不存在
-        msg = "NotFound";
+        else msg = "PasswordWrong";        //密码错误
+    } else {
+        msg = "NotFound";                  //用户不存在
     }
     qDebug()<<"msg1是："<<msg;
 
@@ -107,7 +108,8 @@ void DealLogin::send_login_back_messages(QByteArray postData)
 
 /**
  * @brief DealLogin::set_login_back_json 设置客户端需要使用登录结果反馈的json数据包
- * @param msg 欲发送给客户端登录操作产生的结果，有'true', 'NotFound', 'PasswordWrong'
+ * @param msg,user_info_has_completed 欲发送给客户端登录操作产生的结果，msg有'true', 'NotFound', 'PasswordWrong'
+ *                                    以及用户是否完善了信息,user_info_has_completed有'true'和'false'
  * @return 设置好的json数据包
  */
 QByteArray DealLogin::set_login_back_json(QString msg){
