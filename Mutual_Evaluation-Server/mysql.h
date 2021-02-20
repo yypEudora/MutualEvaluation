@@ -17,16 +17,19 @@ public:
     void init_database();      //初始化数据
 
     bool user_is_exist(QString current_user, QString user);  //判断用户是否存在
-    bool student_is_exist(QString user);    //判断学生用户是否存在
-    bool teacher_is_exist(QString user);    //判断教师用户是否存在
-    bool zhujiao_is_exist(QString user);    //判断助教用户是否存在
-
-
     bool password_is_correct(QString current_user, QString user, QString pwd);  //判断密码是否正确
-
-
-
     void regist_success(QString current_user, QString user, QString pwd);//注册到数据库
+
+    //用于用户登录后初始化用户的数据
+    void init_user_data(QString current_user, QString user, QString &pwd, QString &name, QString &sex,
+                        QString &academy, QString &grade, QString &major, QString &clas,
+                        QString &tell, QString &qq, int &course_number, bool &completed_info);
+    //将修改过后的个人信息写到服务器
+    void save_user_info(QString current_user, QString user, QString name, QString sex,
+                        QString academy, QString grade, QString major, QString clas,
+                        QString tell, QString qq, bool completed_info);
+
+
     int set_token(const char *user, char *token);
     QString get_str_md5(QString str);
 

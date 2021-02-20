@@ -13,13 +13,18 @@ SOURCES += \
     dealRegist.cpp \
     main.cpp \
     mainwindow.cpp \
-    mysql.cpp
+    student/deal_user_info.cpp \
+    mysql.cpp \
+    student/stu_main.cpp
 
 HEADERS += \
     dealLogin.h \
     dealRegist.h \
     mainwindow.h \
-    mysql.h
+    student/dealRegist.h \
+    mysql.h \
+    student/deal_user_info.h \
+    student/stu_main.h
 
 FORMS += \
     mainwindow.ui
