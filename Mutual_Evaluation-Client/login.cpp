@@ -14,6 +14,8 @@
 #include <QHostAddress>
 #include <QLoggingCategory>
 #include <QDebug>
+#include "student/stu_login_instance.h"
+
 
 Login::Login(QWidget *parent)
     : QDialog(parent)
@@ -29,7 +31,6 @@ Login::Login(QWidget *parent)
     m_stu_mainwindow = new Stu_Mainwindow;
     m_tc_mainwindow = new Tc_Mainwindow;
     m_zj_mainwindow = new Zj_mainwindow;
-
 
     //去掉创建的边框
     this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
@@ -128,13 +129,13 @@ void Login::manage_signals()
     // 教师主界面切换用户 - 重新登录
     connect(m_tc_mainwindow, &Tc_Mainwindow::change_user, [=]()
     {
-        m_stu_mainwindow->hide();
+        m_tc_mainwindow->hide();
         this->show();
     });
     // 助教主界面切换用户 - 重新登录
     connect(m_zj_mainwindow, &Zj_mainwindow::change_user, [=]()
     {
-        m_stu_mainwindow->hide();
+        m_zj_mainwindow->hide();
         this->show();
     });
 }
@@ -421,7 +422,7 @@ void Login::on_set2_btn_clicked()
     }
     // 跳转到登陆界面
     ui->stackedWidget->setCurrentWidget(ui->login_page);
-    m_cm.writeWebInfo(ip,port);
+    //m_cm.writeWebInfo(ip,port);
 }
 
 
@@ -463,7 +464,8 @@ void Login::read_login_back_messages(QString msg)
          //判断登录成功后显示哪种类别的主界面
         if(current_user == "student"){
             cout<<"学生正在登录...";
-            //LoginInfoInstance *p = LoginInfoInstance::getInstance(); //获取单例
+            Stu_Login_Instance *login_instance = Stu_Login_Instance::getInstance(); //获取单例
+            login_instance->set_login_info(ui->name_tx->text(), ui->ip_tx->text(), ui->port_tx->text());
             m_stu_mainwindow->show_mainwindow(); //显示学生主界面
         }
         else if(current_user == "teacher"){
@@ -504,6 +506,7 @@ void Login::read_regist_back_messages(QString msg)
                                  QMessageBox::Yes | QMessageBox::No,
                                  QMessageBox::Yes);
         //跳转到登录界面
+        ui->stackedWidget->setCurrentWidget(ui->login_page);
 
     } else if(msg == "Existed"){
         QMessageBox::information(NULL, "信息提示",
@@ -516,7 +519,8 @@ void Login::read_regist_back_messages(QString msg)
 
 /**
  * @brief Login::get_back_json 解析注册/登录反馈信息json包
- * @param back_buf, sender, msg 整个反馈信息的缓冲区，服务端的发送者，服务成功与否的反馈信息
+ * @param back_buf, sender, msg, user_info_has_completed 整个反馈信息的缓冲区，服务端的发送者，服务成功与否的反馈信息
+ *                                                       用户是否完善了个人信息
  */
 void Login::get_back_json(QByteArray &back_buf, QString &sender,QString &msg)
 {
@@ -544,9 +548,10 @@ void Login::get_back_json(QByteArray &back_buf, QString &sender,QString &msg)
                     msg = value.toString();
                 }
             }
+
         }
     }
-    qDebug()<<"返回的信息包："<<sender<<" "<<msg;
+    qDebug()<<"返回的信息包："<<sender<<" "<<msg<<" ";
 }
 
 
