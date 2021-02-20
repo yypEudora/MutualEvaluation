@@ -20,6 +20,7 @@ SOURCES += \
     login.cpp \
     main.cpp \
     student/stu_info.cpp \
+    student/stu_login_instance.cpp \
     student/stu_mainwindow.cpp \
     teacher/tc_info.cpp \
     teacher/tc_mainwindow.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     common/des.h \
     login.h \
     student/stu_info.h \
+    student/stu_login_instance.h \
     student/stu_mainwindow.h \
     teacher/tc_info.h \
     teacher/tc_mainwindow.h \

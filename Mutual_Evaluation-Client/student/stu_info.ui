@@ -205,7 +205,7 @@ color: rgb(138, 167, 175);</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="6" column="2">
-        <widget class="QLineEdit" name="lineEdit">
+        <widget class="QLineEdit" name="stu_qq_tx">
          <property name="styleSheet">
           <string notr="true">background:transparent;
 border-color:#a4ccd4;
@@ -237,7 +237,7 @@ border-left-width:0px;</string>
         </widget>
        </item>
        <item row="5" column="2">
-        <widget class="QLineEdit" name="stu_pn_tx">
+        <widget class="QLineEdit" name="stu_tell_tx">
          <property name="styleSheet">
           <string notr="true">background:transparent;
 border-color:#a4ccd4;
@@ -250,7 +250,7 @@ border-left-width:0px;</string>
         </widget>
        </item>
        <item row="4" column="2">
-        <widget class="QLineEdit" name="stu_dep_tx">
+        <widget class="QLineEdit" name="stu_academy_tx">
          <property name="styleSheet">
           <string notr="true">background:transparent;
 border-color:#a4ccd4;
@@ -282,7 +282,7 @@ border-left-width:0px;</string>
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="QLineEdit" name="stu_gc_tx">
+        <widget class="QLineEdit" name="stu_grade_tx">
          <property name="minimumSize">
           <size>
            <width>90</width>
@@ -434,7 +434,7 @@ border-left-width:0px;</string>
         <height>71</height>
        </rect>
       </property>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="save_btn">
        <property name="geometry">
         <rect>
          <x>100</x>

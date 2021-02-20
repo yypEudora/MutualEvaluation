@@ -19,11 +19,23 @@ public:
     // 显示主窗口
     void show_mainwindow();
     // 处理信号
-    void manager_signals();
+    void manage_signals();
     // 重新登陆
     void login_again();
     // 界面设置
     void ui_set();
+    // 连接服务器获取用户数据
+    void acquire_user_data();
+    //设置发送给服务器的用户以及请求获取用户数据
+    QByteArray set_user_data_json();
+    // 连接服务器保存个人信息
+    void save_personal_info_to_server();
+    //设置发送给服务器的用户个人信息数据
+    QByteArray set_personal_info_json();
+
+    void get_back_json(QByteArray back_buf, QString &service, QString &pwd, QString &name, QString &sex,
+                        QString &academy, QString &grade, QString &major, QString &clas,
+                        QString &tell, QString &qq, int &course_number, bool &completed_info); //解析返回的json数据包
 
 protected:
     void mouseMoveEvent(QMouseEvent *event);
@@ -34,6 +46,10 @@ signals:
     // 切换用户按钮信号
     void change_user();
 
+private slots:
+    // 读取服务器返回的用户数据json包
+    void read_back_messages();
+
 private:
     Ui::Stu_Mainwindow *ui;
     QMenu *m_stu_info_menu;
@@ -42,9 +58,28 @@ private:
 
     Stu_Info* m_stu_info;
 
+
+    QString m_user; //当前登录用户
+    QString m_password;
+    QString m_name;
+    QString m_sex;
+    QString m_academy;
+    QString m_grade;
+    QString m_major;
+    QString m_class;
+    QString m_tell;
+    QString m_qq;
+    int m_course_number;
+    bool m_completed_info; //是否完善个人信息
+    QString m_ip;
+    QString m_port;
+
+    QTcpSocket *m_tcpSocket;//socket
+
     QPoint m_pt;
     bool m_bPressed = true; //响应鼠标点击
     bool m_max_or_normal = true; //界面放大缩小
+
 };
 
 #endif // STU_MAINWINDOW_H

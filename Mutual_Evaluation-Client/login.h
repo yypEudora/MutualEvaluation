@@ -27,7 +27,6 @@ public:
 
     // 设置登陆用户信息的json包
     QByteArray set_login_json(QString current_user, QString user, QString pwd);
-
     // 设置注册用户信息的json包
     QByteArray set_register_json(QString current_user, QString user,QString pwd);
 
