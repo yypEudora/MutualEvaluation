@@ -242,7 +242,10 @@ void MYSQL::regist_success(QString current_user, QString user, QString pwd)
 }
 
 
-
+/**
+ * @brief MYSQL::init_user_data 用于用户登录后初始化用户的数据
+ * @param current_user, user... 查询哪张用户表，欲查询的用户的个人数据
+ */
 void MYSQL::init_user_data(QString current_user, QString user, QString &pwd, QString &name, QString &sex,
                     QString &academy, QString &grade, QString &major, QString &clas,
                     QString &tell, QString &qq, int &course_number, bool &completed_info)
@@ -261,7 +264,7 @@ void MYSQL::init_user_data(QString current_user, QString user, QString &pwd, QSt
 
     qDebug()<<"命令是" << cmd;
     query.exec(cmd);
-
+    QString if_completed; //数据表中此字段是vchar类型
     while(query.next()) {
         pwd = query.value(1).toString();
         name = query.value(2).toString();
@@ -273,16 +276,23 @@ void MYSQL::init_user_data(QString current_user, QString user, QString &pwd, QSt
         tell = query.value(8).toString();
         qq = query.value(9).toString();
         course_number = query.value(10).toInt();
-        completed_info = query.value(11).toBool();
+        if_completed = query.value(11).toString();
+        if(if_completed == "true")
+            completed_info = true;
+        else
+            completed_info = false;
     }
 }
 
 
-
+/**
+ * @brief MYSQL::save_user_info 将修改过后的个人信息写到服务器
+ * @param current_user, user... 保存到哪张用户表，欲保存的用户的个人数据
+ */
 //测试使用，数据库命令需要改进
 void MYSQL::save_user_info(QString current_user, QString user, QString name, QString sex,
                            QString academy, QString grade, QString major, QString clas,
-                           QString tell, QString qq, bool completed_info)
+                           QString tell, QString qq)
 {
     connect_mysql();
     QSqlQuery query(m_database);
@@ -295,13 +305,7 @@ void MYSQL::save_user_info(QString current_user, QString user, QString name, QSt
     QString cmd6;
     QString cmd7;
     QString cmd8;
-    QString if_completed;//数据表中是以vchar类型存储的
-    if(completed_info)
-        if_completed = "true";
-    else
-        if_completed = "false";
-
-
+    QString if_completed="true";//数据表中是以vchar类型存储的
 
     if(current_user == "student"){
         cmd = "update Student_Info set Name='"+name+"' where Id='"+user+"'";
@@ -334,6 +338,30 @@ void MYSQL::save_user_info(QString current_user, QString user, QString name, QSt
     query.exec(cmd7);
     query.exec(cmd8);
 }
+
+
+
+/**
+ * @brief MYSQL::save_user_pwd 将修改过后的密码写到服务器
+ * @param current_user, user, pwd 保存到哪张用户表，欲保存的用户的密码
+ */
+void MYSQL::save_user_pwd(QString current_user, QString user, QString pwd)
+{
+    connect_mysql();
+    QSqlQuery query(m_database);
+    QString cmd;
+
+    if(current_user == "student")
+        cmd = "update Student_Info set Password='"+pwd+"' where Id='"+user+"'";
+    else if(current_user == "teacher")
+        cmd = "update Teacher_Info set Password='"+pwd+"' where Id='"+user+"'";
+    else if(current_user == "zhujiao")
+        cmd = "update Zhujiao_Info set Password='"+pwd+"' where Id='"+user+"'";
+
+    qDebug()<<"命令是" << cmd;
+    query.exec(cmd);
+}
+
 
 
 /**
@@ -396,6 +424,8 @@ QString MYSQL::get_str_md5(QString str)
 
     return array.toHex();
 }
+
+
 
 
 
