@@ -148,7 +148,11 @@ void MainWindow::read_regist_messages(QByteArray send_buf, QString current_user)
     deal_regist.read_regist_messages(send_buf, current_user);
 }
 
-//响应学生用户类别请求的服务
+
+/**
+ * @brief MainWindow::read_student_messages 响应学生用户类别请求的服务
+ * @param send_buf 客户端发送过来的数据
+ */
 void MainWindow::read_student_messages(QByteArray send_buf){
     Stu_Main stu_main{m_tcpSocket, m_mysql};
     stu_main.read_service_messages(send_buf);
