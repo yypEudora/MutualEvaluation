@@ -15,7 +15,7 @@
 #include <QLoggingCategory>
 #include <QDebug>
 #include "student/stu_login_instance.h"
-
+#include "student/stu_pwd.h"
 
 Login::Login(QWidget *parent)
     : QDialog(parent)
@@ -137,6 +137,25 @@ void Login::manage_signals()
     {
         m_zj_mainwindow->hide();
         this->show();
+    });
+
+
+    //为学生修改密码界面输入的原始密码进行加密
+    connect(m_stu_mainwindow, &Stu_Mainwindow::check_before_pwd, [=]()
+    {
+        Stu_Pwd* stu_pwd = m_stu_mainwindow->return_stu_pwd_window();
+        QString pwd;
+        stu_pwd->return_input_pwd(pwd);
+        stu_pwd->pwd_str_md5 = m_cm.getStrMd5(pwd);//加密
+    });
+
+    //为学生修改密码界面输入的新密码进行加密
+    connect(m_stu_mainwindow, &Stu_Mainwindow::save_updated_pwd_to_server, [=]()
+    {
+        Stu_Pwd* stu_pwd = m_stu_mainwindow->return_stu_pwd_window();
+        QString new_pwd;
+        stu_pwd->return_input_new_pwd(new_pwd);
+        stu_pwd->new_pwd_str_md5 = m_cm.getStrMd5(new_pwd);//加密
     });
 }
 
@@ -464,8 +483,10 @@ void Login::read_login_back_messages(QString msg)
          //判断登录成功后显示哪种类别的主界面
         if(current_user == "student"){
             cout<<"学生正在登录...";
-            Stu_Login_Instance *login_instance = Stu_Login_Instance::getInstance(); //获取单例
+            //获取单例
+            Stu_Login_Instance *login_instance = Stu_Login_Instance::getInstance();
             login_instance->set_login_info(ui->name_tx->text(), ui->ip_tx->text(), ui->port_tx->text());
+
             m_stu_mainwindow->show_mainwindow(); //显示学生主界面
         }
         else if(current_user == "teacher"){
