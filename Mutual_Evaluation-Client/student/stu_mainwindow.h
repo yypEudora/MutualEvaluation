@@ -86,10 +86,11 @@ private:
     QString m_qq;
     int m_course_number;
     bool m_completed_info; //是否完善个人信息
+
     QString m_ip;
     QString m_port;
-
     QTcpSocket *m_tcpSocket;//socket
+
     QPoint m_pt;
     bool m_bPressed = true; //响应鼠标点击
     bool m_max_or_normal = true; //界面放大缩小

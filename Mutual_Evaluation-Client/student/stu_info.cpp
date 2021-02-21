@@ -58,6 +58,8 @@ void Stu_Info::show_mainwindow(QString pwd, QString name, QString sex, QString a
     m_tell = tell;
     m_qq = qq;
     m_completed_info = completed_info;
+
+    //如果已完善个人信息则隐藏注意标语
     if(completed_info)
        this->ui->stu_warning_label->hide();
 }

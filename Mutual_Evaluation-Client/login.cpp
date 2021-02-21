@@ -16,6 +16,7 @@
 #include <QDebug>
 #include "student/stu_login_instance.h"
 #include "student/stu_pwd.h"
+#include "teacher/tc_login_instance.h"
 
 Login::Login(QWidget *parent)
     : QDialog(parent)
@@ -156,6 +157,24 @@ void Login::manage_signals()
         QString new_pwd;
         stu_pwd->return_input_new_pwd(new_pwd);
         stu_pwd->new_pwd_str_md5 = m_cm.getStrMd5(new_pwd);//加密
+    });
+
+    //为教师修改密码界面输入的原始密码进行加密
+    connect(m_tc_mainwindow, &Tc_Mainwindow::check_before_pwd, [=]()
+    {
+        Tc_Pwd* tc_pwd = m_tc_mainwindow->return_tc_pwd_window();
+        QString pwd;
+        tc_pwd->return_input_pwd(pwd);
+        tc_pwd->pwd_str_md5 = m_cm.getStrMd5(pwd);//加密
+    });
+
+    //为教师修改密码界面输入的新密码进行加密
+    connect(m_tc_mainwindow, &Tc_Mainwindow::save_updated_pwd_to_server, [=]()
+    {
+        Tc_Pwd* tc_pwd = m_tc_mainwindow->return_tc_pwd_window();
+        QString new_pwd;
+        tc_pwd->return_input_new_pwd(new_pwd);
+        tc_pwd->new_pwd_str_md5 = m_cm.getStrMd5(new_pwd);//加密
     });
 }
 
@@ -484,13 +503,16 @@ void Login::read_login_back_messages(QString msg)
         if(current_user == "student"){
             cout<<"学生正在登录...";
             //获取单例
-            Stu_Login_Instance *login_instance = Stu_Login_Instance::getInstance();
-            login_instance->set_login_info(ui->name_tx->text(), ui->ip_tx->text(), ui->port_tx->text());
+            Stu_Login_Instance *stu_login_instance = Stu_Login_Instance::getInstance();
+            stu_login_instance->set_login_info(ui->name_tx->text(), ui->ip_tx->text(), ui->port_tx->text());
 
             m_stu_mainwindow->show_mainwindow(); //显示学生主界面
         }
         else if(current_user == "teacher"){
             cout<<"教师正在登录...";
+            Tc_Login_Instance *tc_login_instance = Tc_Login_Instance::getInstance();
+            tc_login_instance->set_login_info(ui->name_tx->text(), ui->ip_tx->text(), ui->port_tx->text());
+
             m_tc_mainwindow->show_mainwindow(); //显示教师主界面
         }
         else if(current_user == "zhujiao"){
