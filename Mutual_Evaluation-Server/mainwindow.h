@@ -32,6 +32,7 @@ private slots:
     void read_login_messages(QByteArray send_buf, QString current_user);
     void read_regist_messages(QByteArray send_buf, QString current_user);
     void read_student_messages(QByteArray send_buf);
+    void read_teacher_messages(QByteArray send_buf);
 
 private:
     Ui::MainWindow *ui;

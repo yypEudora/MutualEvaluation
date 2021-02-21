@@ -1,5 +1,5 @@
-#include "student/deal_stu_info.h"
-#include "student/stu_main.h"
+#include "teacher/tc_main.h"
+#include "teacher/deal_tc_info.h"
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFile>
@@ -14,64 +14,61 @@
 
 using std::cout;
 
-Stu_Main::Stu_Main(QTcpSocket *tcpSocket, MYSQL mysql){
+Tc_Main::Tc_Main(QTcpSocket *tcpSocket, MYSQL mysql){
     m_tcpSocket = tcpSocket;
     m_mysql = mysql;
 }
 
-Stu_Main::~Stu_Main(){
+Tc_Main::~Tc_Main(){
     qDebug()<<"学生请求的服务析构掉啦！！！";
 }
 
 
 /**
- * @brief Stu_Main::read_service_messages 获取客户端请求的服务信息
+ * @brief Tc_Main::read_service_messages 获取客户端请求的服务信息
  * @param send_buf客户端传过来的数据，当前请求登录操作的用户类别
  */
-void Stu_Main::read_service_messages(QByteArray send_buf)
+void Tc_Main::read_service_messages(QByteArray send_buf)
 {
     QByteArray temp_buf = send_buf;
     //获取登录信息
     QString service;
-    QString current_user = "student";
+    QString current_user = "teacher";
     QString user;
     QString pwd;
     QString name;
     QString sex;
     QString academy;
-    QString grade;
-    QString major;
-    QString clas;
+    QString email;
     QString tell;
     QString qq;
     int course_number;
     bool completed_info; //是否完善个人信息
 
-    Deal_Stu_Info deal_stu_info{m_tcpSocket, m_mysql};//学生信息相关处理对象
+    Deal_Tc_Info deal_tc_info{m_tcpSocket, m_mysql};//学生信息相关处理对象
 
     //获取客户端传来的请求服务信息json包
-    get_service_json(temp_buf,service,user, pwd, name,sex,academy, grade, major, clas,tell, qq, completed_info);
+    get_service_json(temp_buf,service,user, pwd, name, sex, academy, email, tell, qq, completed_info);
 
     QByteArray post_data;
     if(service == "acquire_user_data")                          //处理初始化用户数据
-        deal_stu_info.acquire_user_data(user, pwd,name,sex,academy,grade,major, clas,tell,qq,course_number,completed_info);
+        deal_tc_info.acquire_user_data(current_user, user, pwd,name,sex,academy,email,tell,qq,course_number,completed_info);
     else if(service == "save_personal_info_to_server"){         //保存修改过的个人信息
-        deal_stu_info.save_personal_info_to_server(user, name, sex, academy, grade, major, clas, tell, qq);
+        deal_tc_info.save_personal_info_to_server(current_user, user, name, sex, academy, email, tell, qq);
         completed_info = true;  //为防止后续请求服务中，completed_info仍为false
     }
     else if(service == "save_personal_pwd_to_server")          //保存修改过的密码
-        deal_stu_info.save_personal_pwd_to_server(current_user,user,pwd);
+        deal_tc_info.save_personal_pwd_to_server(current_user,user,pwd);
 
 }
 
 
 /**
- * @brief Stu_Main::get_service_json 解析客户端请求服务的json数据包
+ * @brief Tc_Main::get_service_json 解析客户端请求服务的json数据包
  * @param temp_buf, service... 缓冲区，json数据包中想解析的内容
  */
-void Stu_Main::get_service_json(QByteArray temp_buf, QString &service, QString &user, QString &pwd, QString &name, QString &sex,
-                                QString &academy, QString &grade, QString &major, QString &clas,
-                                QString &tell, QString &qq, bool &completed_info)
+void Tc_Main::get_service_json(QByteArray temp_buf, QString &service, QString &user, QString &pwd, QString &name, QString &sex,
+                                QString &academy, QString &email, QString &tell, QString &qq, bool &completed_info)
 {        /*json数据如下
         {
             sender:xxxx,
@@ -123,22 +120,10 @@ void Stu_Main::get_service_json(QByteArray temp_buf, QString &service, QString &
                     academy = value.toString();
                 }
             }
-            if (object.contains("grade")) {
-                QJsonValue value = object.value("grade");
+            if (object.contains("email")) {
+                QJsonValue value = object.value("email");
                 if (value.isString()) {
-                    grade = value.toString();
-                }
-            }
-            if (object.contains("major")) {
-                QJsonValue value = object.value("major");
-                if (value.isString()) {
-                    major = value.toString();
-                }
-            }
-            if (object.contains("class")) {
-                QJsonValue value = object.value("class");
-                if (value.isString()) {
-                    clas = value.toString();
+                    email = value.toString();
                 }
             }
             if (object.contains("tell")) {

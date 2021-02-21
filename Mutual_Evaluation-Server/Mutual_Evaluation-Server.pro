@@ -15,7 +15,9 @@ SOURCES += \
     mainwindow.cpp \
     mysql.cpp \
     student/deal_stu_info.cpp \
-    student/stu_main.cpp
+    student/stu_main.cpp \
+    teacher/deal_tc_info.cpp \
+    teacher/tc_main.cpp
 
 HEADERS += \
     dealLogin.h \
@@ -24,7 +26,9 @@ HEADERS += \
     student/dealRegist.h \
     mysql.h \
     student/deal_stu_info.h \
-    student/stu_main.h
+    student/stu_main.h \
+    teacher/deal_tc_info.h \
+    teacher/tc_main.h
 
 FORMS += \
     mainwindow.ui
