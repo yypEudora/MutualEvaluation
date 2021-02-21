@@ -1,4 +1,4 @@
-#include "deal_stu_info.h"
+#include "student/deal_stu_info.h"
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFile>
@@ -27,13 +27,13 @@ Deal_Stu_Info::~Deal_Stu_Info(){
  * @brief Deal_Stu_Info::acquire_user_data 处理初始化学生用户数据
  * @param current_user, user... 当前用户类型，请求保存的数据
  */
-void Deal_Stu_Info::acquire_user_data(QString current_user, QString user, QString pwd, QString name,
+void Deal_Stu_Info::acquire_user_data(QString user, QString pwd, QString name,
                                       QString sex, QString academy, QString grade, QString major,
                                       QString clas, QString tell, QString qq, int course_number,
                                       bool completed_info)
 {
     QByteArray post_data;
-    m_mysql.init_user_data(current_user, user, pwd,name,sex,academy,grade,major, clas,tell,qq,course_number,completed_info);
+    m_mysql.init_stu_data(user, pwd,name,sex,academy,grade,major, clas,tell,qq,course_number,completed_info);
     post_data = set_user_data_back_json(pwd,name,sex,academy,grade,major, clas,tell,qq,course_number,completed_info);
     send_service_messages(post_data);
 }
@@ -43,11 +43,11 @@ void Deal_Stu_Info::acquire_user_data(QString current_user, QString user, QStrin
  * @brief Deal_Stu_Info::save_personal_info_to_server 保存修改后的个人信息
  * @param current_user, user... 当前用户类型，请求保存的数据
  */
-void Deal_Stu_Info::save_personal_info_to_server(QString current_user, QString user, QString name,
+void Deal_Stu_Info::save_personal_info_to_server(QString user, QString name,
                                   QString sex, QString academy, QString grade, QString major,
                                   QString clas, QString tell, QString qq)
 {
-    m_mysql.save_user_info(current_user, user, name, sex, academy, grade, major, clas, tell, qq);
+    m_mysql.save_stu_info(user, name, sex, academy, grade, major, clas, tell, qq);
 
 }
 

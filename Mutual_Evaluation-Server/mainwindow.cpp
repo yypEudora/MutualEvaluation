@@ -9,6 +9,7 @@
 #include "dealRegist.h"
 #include "dealLogin.h"
 #include "student/stu_main.h"
+#include "teacher/tc_main.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -123,8 +124,12 @@ void MainWindow::read_messages(){
     else if(sender == "student"){
         read_student_messages(send_buf);
         qDebug() <<"处理学生请求的服务";
-
     }
+    else if(sender == "teacher"){
+        read_teacher_messages(send_buf);
+        qDebug() <<"处理教师请求的服务";
+    }
+
 }
 
 
@@ -158,6 +163,15 @@ void MainWindow::read_student_messages(QByteArray send_buf){
     stu_main.read_service_messages(send_buf);
 }
 
+
+/**
+ * @brief MainWindow::read_teacher_messages 响应教师用户类别请求的服务
+ * @param send_buf 客户端发送过来的数据
+ */
+void MainWindow::read_teacher_messages(QByteArray send_buf){
+    Tc_Main tc_main{m_tcpSocket, m_mysql};
+    tc_main.read_service_messages(send_buf);
+}
 
 
 /**
