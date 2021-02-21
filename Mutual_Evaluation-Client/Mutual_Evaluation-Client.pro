@@ -22,8 +22,10 @@ SOURCES += \
     student/stu_info.cpp \
     student/stu_login_instance.cpp \
     student/stu_mainwindow.cpp \
+    student/stu_pwd.cpp \
     teacher/tc_info.cpp \
     teacher/tc_mainwindow.cpp \
+    teacher/tc_pwd.cpp \
     titlewg.cpp \
     zhujiao/zj_mainwindow.cpp
 
@@ -34,8 +36,10 @@ HEADERS += \
     student/stu_info.h \
     student/stu_login_instance.h \
     student/stu_mainwindow.h \
+    student/stu_pwd.h \
     teacher/tc_info.h \
     teacher/tc_mainwindow.h \
+    teacher/tc_pwd.h \
     titlewg.h \
     zhujiao/zj_mainwindow.h
 
@@ -43,8 +47,10 @@ FORMS += \
     login.ui \
     student/stu_info.ui \
     student/stu_mainwindow.ui \
+    student/stu_pwd.ui \
     teacher/tc_info.ui \
     teacher/tc_mainwindow.ui \
+    teacher/tc_pwd.ui \
     titlewg.ui \
     zhujiao/zj_mainwindow.ui
 

@@ -12,7 +12,7 @@ public:
      static Stu_Login_Instance *getInstance(); //保证唯一一个实例
      static void destroy(); //释放堆区空间
 
-     void set_login_info( QString current_user, QString ip, QString port);//设置登陆信息
+     void set_login_info( QString user, QString ip, QString port);//设置登陆信息
      QString get_user() const;   //获取登录用户
      QString get_ip() const;    //获取登录ip
      QString get_port() const;    //获取登录port

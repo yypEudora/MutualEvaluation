@@ -16,6 +16,11 @@ Stu_Info::Stu_Info(QWidget *parent) :
     //去掉创建的边框
     this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
 
+    // 数据的格式提示
+    ui->stu_name_tx->setToolTip("合法字符:[a-z|A-Z|#|@|0-9|-|_|*],字符个数: 1~16");
+    ui->stu_tell_tx->setToolTip("合法字符:[0-9],字符个数: 13");
+    ui->stu_qq_tx->setToolTip("合法字符:[0-9],字符个数: 7~15");
+
     manage_signals();
 
 }
@@ -25,8 +30,12 @@ Stu_Info::~Stu_Info()
     delete ui;
 }
 
+/**
+ * @brief Stu_Info::show_mainwindow 显示学生修改个人信息界面
+ * @param pwd, name, sex...  当前用户的用户数据
+ */
 void Stu_Info::show_mainwindow(QString pwd, QString name, QString sex, QString academy, QString grade,
-                               QString major, QString clas,QString tell, QString qq)
+                               QString major, QString clas,QString tell, QString qq, bool completed_info)
 {
     this->show();
     ui->stu_name_tx->setText(name);
@@ -34,7 +43,7 @@ void Stu_Info::show_mainwindow(QString pwd, QString name, QString sex, QString a
     ui->stu_academy_tx->setText(academy);
     ui->stu_grade_tx->setText(grade);
     ui->stu_class_tx->setText(clas);
-    //设置专业 ui->stu_major_tx->setText(major);
+    ui->stu_major_tx->setText(major);
     ui->stu_tell_tx->setText(tell);
     ui->stu_qq_tx->setText(qq);
 
@@ -48,8 +57,15 @@ void Stu_Info::show_mainwindow(QString pwd, QString name, QString sex, QString a
     m_class = clas;
     m_tell = tell;
     m_qq = qq;
+    m_completed_info = completed_info;
+    if(completed_info)
+       this->ui->stu_warning_label->hide();
 }
 
+
+/**
+ * @brief Stu_Info::manage_signals 管理信号槽连接
+ */
 void Stu_Info::manage_signals()
 {
     //缩小按钮
@@ -65,26 +81,27 @@ void Stu_Info::manage_signals()
 
     //保存按钮
     connect(ui->save_btn, &QToolButton::clicked,[=](){
-        //...判断个人信息的输入是否合法
-
-        //判断个人信息是否变化
-        if(!check_info_updated()){  //没有变化
-            QMessageBox::information(this, tr("提示"),
-                                     QString(tr("并没有任何修改！")),
-                                     QMessageBox::Yes);
-        }
-        else{
-            int choose;
-            choose=QMessageBox::warning(this, tr("提示"),
-                                         QString(tr("是否保存修改？")),
-                                         QMessageBox::Yes | QMessageBox::No);
-            if (choose== QMessageBox::Yes)
-            {
-              save_changed_info();
-              QMessageBox::information(this, tr("提示"),
-                                    QString(tr("保存成功！")),
-                                    QMessageBox::Yes);
-             }
+        //判断个人信息的输入格式是否合法
+        if(check_info_valid()){      //格式合法
+            //判断个人信息是否变化
+            if(!check_info_updated()){  //没有变化
+                QMessageBox::information(this, tr("提示"),
+                                         QString(tr("并没有任何修改！")),
+                                         QMessageBox::Yes);
+            }
+            else{
+                int choose;
+                choose=QMessageBox::warning(this, tr("提示"),
+                                             QString(tr("是否保存修改？")),
+                                             QMessageBox::Yes | QMessageBox::No);
+                if (choose== QMessageBox::Yes)
+                {
+                  save_changed_info();
+                  QMessageBox::information(this, tr("提示"),
+                                        QString(tr("保存成功！")),
+                                        QMessageBox::Yes);
+                 }
+            }
         }
     });
 
@@ -97,10 +114,13 @@ void Stu_Info::manage_signals()
                                          QMessageBox::Yes | QMessageBox::No);
             if (choose== QMessageBox::Yes)  //保存修改
             {
-                save_changed_info();
-                QMessageBox::information(this, tr("提示"),
-                                        QString(tr("保存成功！")),
-                                        QMessageBox::Yes);
+                //判断个人信息的输入是否合法
+                if(check_info_valid()){
+                    save_changed_info();
+                    QMessageBox::information(this, tr("提示"),
+                                            QString(tr("保存成功！")),
+                                            QMessageBox::Yes);
+                }
              }
             else                            //不保存修改，直接返回
                 back_to_stu_mainwindow();
@@ -111,55 +131,133 @@ void Stu_Info::manage_signals()
     });
 }
 
+
+/**
+ * @brief Stu_Info::back_to_stu_mainwindow 返回到学生主界面
+ */
 void Stu_Info::back_to_stu_mainwindow()
 {
     this->hide();
     emit back_to_mainwindow(); //向主界面发送返回主界面的信号
 }
 
+
 void Stu_Info::set_ui()
 {
-    //缩小按钮
-    QIcon icon;
-    icon = style()->standardIcon( QStyle::SP_TitleBarMinButton);
-    ui->hide_btn->setIcon(icon);
-    //关闭按钮
-    icon = style()->standardIcon(QStyle::SP_TitleBarCloseButton);
-    ui->close_btn->setIcon(icon);
+//    //缩小按钮
+//    QIcon icon;
+//    icon = style()->standardIcon( QStyle::SP_TitleBarMinButton);
+//    ui->hide_btn->setIcon(icon);
+//    //关闭按钮
+//    icon = style()->standardIcon(QStyle::SP_TitleBarCloseButton);
+//    ui->close_btn->setIcon(icon);
 }
 
+
+/**
+ * @brief Stu_Info::check_info_updated 检查个人信息是否被修改
+ */
 bool Stu_Info::check_info_updated()
 {
 
 //    if(ui->stu_name_tx->isModified() || ui->stu_sex_tx->isModified() || ui->stu_academy_tx->isModified() || ui->stu_grade_tx->isModified()
 //        || ui->stu_class_tx->isModified() || ui->stu_tell_tx->isModified() || ui->stu_qq_tx->isModified())
 //        return true;
-//    return false;
+//    return false; 这种方法不方便在返回的时候检查个人信息是否被修改
 
-    //少了|| ui->stu_major_tx->isModified()
     if(m_name != ui->stu_name_tx->text() || m_sex != ui->stu_sex_tx->text() || m_academy != ui->stu_academy_tx->text()
-            || m_grade != ui->stu_grade_tx->text() || m_class != ui->stu_class_tx->text() || m_tell != ui->stu_tell_tx->text()
+            || m_grade != ui->stu_grade_tx->text() || m_major != ui->stu_major_tx->text() || m_class != ui->stu_class_tx->text() || m_tell != ui->stu_tell_tx->text()
             || m_qq != ui->stu_qq_tx->text())
         return true;
 
     return false;
 }
 
+
+/**
+ * @brief Stu_Info::check_info_valid 检查个人信息的合法性
+ */
+//数据校验有bug，后面完善
+bool Stu_Info::check_info_valid()
+{
+    QString name = m_name;
+    QString tell = m_tell;
+    QString qq = m_qq;
+
+    if(ui->stu_name_tx->text()=="")
+    {
+        QMessageBox::warning(this, "警告", "用户名不能为空");
+        ui->stu_name_tx->setFocus();
+        return false;
+    }
+    if(ui->stu_tell_tx->text()=="")
+    {
+        QMessageBox::warning(this, "警告", "电话不能为空");
+        ui->stu_tell_tx->setFocus();
+        return false;
+    }
+    if(ui->stu_qq_tx->text()=="")
+    {
+        QMessageBox::warning(this, "警告", "qq不能为空");
+        ui->stu_qq_tx->setFocus();
+        return false;
+    }
+    return true;
+
+
+    // 数据校验
+    QRegExp infoexp(Name);
+//    if(!regexp.exactMatch(name))
+//    {
+//        QMessageBox::warning(this, "警告", "用户名格式不正确");
+//        ui->stu_name_tx->clear();
+//        ui->stu_name_tx->setFocus();
+//        return false;
+//    }
+//    infoexp.setPattern(Tell);
+//    if(!regexp.exactMatch(tell))
+//    {
+//        QMessageBox::warning(this, "警告", "电话格式不正确");
+//        ui->stu_tell_tx->clear();
+//        ui->stu_tell_tx->setFocus();
+//        return false;
+//    }
+//    infoexp.setPattern(QQ);
+//    if(!regexp.exactMatch(qq))
+//    {
+//        QMessageBox::warning(this, "警告", "qq格式不正确");
+//        ui->stu_qq_tx->clear();
+//        ui->stu_qq_tx->setFocus();
+//        return false;
+//    }
+//    return true;
+}
+
+
+/**
+ * @brief Stu_Info::save_changed_info 改变类成员变量以及发送给主界面将新的个人信息保存到服务器的信号
+ */
 void Stu_Info::save_changed_info()
 {
-    //没有major
     m_name = this->ui->stu_name_tx->text();
     m_sex = this->ui->stu_sex_tx->text();
     m_academy = this->ui->stu_academy_tx->text();
     m_grade = this->ui->stu_grade_tx->text();
+    m_major = this->ui->stu_major_tx->text();
     m_class = this->ui->stu_class_tx->text();
     m_tell = this->ui->stu_tell_tx->text();
     m_qq = this->ui->stu_qq_tx->text();
-    emit save_to_server();
+    m_completed_info = true;
+    emit save_updated_info_to_server();
 }
 
+
+/**
+ * @brief Stu_Info::updated_info_return 给主界面调用，查询修改过后的个人信息
+ * @param name, sex, academy...  当前用户可修改的个人信息
+ */
 void Stu_Info::updated_info_return(QString &name, QString &sex, QString &academy, QString &grade,
-                         QString &major, QString &clas,QString &tell, QString &qq)
+                         QString &major, QString &clas,QString &tell, QString &qq, bool &completed_info)
 {
     name = m_name;
     sex = m_sex;
@@ -169,7 +267,9 @@ void Stu_Info::updated_info_return(QString &name, QString &sex, QString &academy
     clas = m_class;
     tell = m_tell;
     qq = m_qq;
+    completed_info = m_completed_info;
 }
+
 
 void Stu_Info::mousePressEvent(QMouseEvent *event)
 {

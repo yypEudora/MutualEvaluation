@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>751</width>
-    <height>692</height>
+    <width>750</width>
+    <height>690</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,7 +72,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="1" column="1">
-        <widget class="QLabel" name="hint_label">
+        <widget class="QLabel" name="stu_warning_label">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -204,7 +204,126 @@
 color: rgb(138, 167, 175);</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="1">
+        <widget class="QLabel" name="stu_name">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>姓名</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLineEdit" name="stu_grade_tx">
+         <property name="minimumSize">
+          <size>
+           <width>90</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background:transparent;
+border-color:#a4ccd4;
+border-style:solid;
+border-top-width:0px;
+border-right-width:0px;
+border-bottom-width:2px;
+border-left-width:0px;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="stu_gradeC">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>年级</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLabel" name="stu_phnum">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>电话</string>
+         </property>
+        </widget>
+       </item>
        <item row="6" column="2">
+        <widget class="QLineEdit" name="stu_tell_tx">
+         <property name="styleSheet">
+          <string notr="true">background:transparent;
+border-color:#a4ccd4;
+border-style:solid;
+border-top-width:0px;
+border-right-width:0px;
+border-bottom-width:2px;
+border-left-width:0px;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QLineEdit" name="stu_class_tx">
+         <property name="styleSheet">
+          <string notr="true">background:transparent;
+border-color:#a4ccd4;
+border-style:solid;
+border-top-width:0px;
+border-right-width:0px;
+border-bottom-width:2px;
+border-left-width:0px;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="stu_dep">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>院系</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2">
         <widget class="QLineEdit" name="stu_qq_tx">
          <property name="styleSheet">
           <string notr="true">background:transparent;
@@ -236,20 +355,19 @@ border-left-width:0px;</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
-        <widget class="QLineEdit" name="stu_tell_tx">
-         <property name="styleSheet">
-          <string notr="true">background:transparent;
-border-color:#a4ccd4;
-border-style:solid;
-border-top-width:0px;
-border-right-width:0px;
-border-bottom-width:2px;
-border-left-width:0px;</string>
+       <item row="4" column="1">
+        <widget class="QLabel" name="stu_class">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>班级</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
+       <item row="5" column="2">
         <widget class="QLineEdit" name="stu_academy_tx">
          <property name="styleSheet">
           <string notr="true">background:transparent;
@@ -281,37 +399,17 @@ border-left-width:0px;</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <widget class="QLineEdit" name="stu_grade_tx">
-         <property name="minimumSize">
-          <size>
-           <width>90</width>
-           <height>0</height>
-          </size>
+       <item row="7" column="1">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
          </property>
-         <property name="styleSheet">
-          <string notr="true">background:transparent;
-border-color:#a4ccd4;
-border-style:solid;
-border-top-width:0px;
-border-right-width:0px;
-border-bottom-width:2px;
-border-left-width:0px;</string>
+         <property name="text">
+          <string>QQ</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="0">
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="1" column="1">
         <widget class="QLabel" name="stu_sex">
@@ -325,32 +423,20 @@ border-left-width:0px;</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QLabel" name="stu_dep">
+       <item row="3" column="1">
+        <widget class="QLabel" name="stu_major">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>院系</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLabel" name="stu_phnum">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>电话</string>
+          <string>专业</string>
          </property>
         </widget>
        </item>
        <item row="3" column="2">
-        <widget class="QLineEdit" name="stu_class_tx">
+        <widget class="QLineEdit" name="stu_major_tx">
          <property name="styleSheet">
           <string notr="true">background:transparent;
 border-color:#a4ccd4;
@@ -361,67 +447,6 @@ border-bottom-width:2px;
 border-left-width:0px;</string>
          </property>
         </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="stu_class">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>班级</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="stu_gradeC">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>年级</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>QQ</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="stu_name">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>姓名</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>

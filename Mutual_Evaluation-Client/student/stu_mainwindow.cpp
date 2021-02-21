@@ -25,6 +25,8 @@ Stu_Mainwindow::Stu_Mainwindow(QWidget *parent) :
     //去掉创建的边框
     this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
     m_stu_info = new Stu_Info;
+    m_stu_pwd = new Stu_Pwd;
+
 
     // 处理所有信号
     manage_signals();
@@ -37,7 +39,9 @@ Stu_Mainwindow::~Stu_Mainwindow()
 }
 
 
-
+/**
+ * @brief Stu_Mainwindow::show_mainwindow 显示学生主界面
+ */
 void Stu_Mainwindow::show_mainwindow()
 {
     //显示窗口
@@ -47,40 +51,25 @@ void Stu_Mainwindow::show_mainwindow()
     m_user = login_instance->get_user();
     m_ip = login_instance->get_ip();
     m_port = login_instance->get_port();
-
     acquire_user_data(); //请求用户的数据
 
     //类型转换
     QByteArray q_user = m_user.toLatin1();
     char *user = q_user.data();
-    ui->welcome_string->setText(QObject::tr(user));
-
-    if(!m_completed_info){         //个人信息没有完善
-        int choose;
-        choose=QMessageBox::warning(this, tr("提示"),
-                                     QString(tr("完善个人信息后才可进行其它操作！\n现在是否去完善个人信息？")),
-                                     QMessageBox::Yes | QMessageBox::No);
-      if (choose== QMessageBox::No)
-       {
-          emit change_user();
-            //什么都不做
-      }
-      else if (choose== QMessageBox::Yes)
-      {
-        cout << "去完善个人信息...";
-        this->hide();
-        m_stu_info->show_mainwindow(m_password, m_name, m_sex, m_academy, m_grade, m_major, m_class, m_tell, m_qq);
-      }
-    }
+    ui->welcome_string->setText(QObject::tr(user)); //设置欢迎语
 }
 
+
+/**
+ * @brief Stu_Mainwindow::manage_signals 管理信号槽连接
+ */
 void Stu_Mainwindow::manage_signals()
 {
     //个人信息保存成功，修改back_to_mainwindow的值
-    connect(m_stu_info, &Stu_Info::save_to_server, [=]()
+    connect(m_stu_info, &Stu_Info::save_updated_info_to_server, [=]()
     {
-       m_completed_info = true;
-       save_personal_info_to_server();
+        m_completed_info = true;
+        save_personal_info_to_server();
     });
 
     //个人信息界面返回到主界面
@@ -90,31 +79,53 @@ void Stu_Mainwindow::manage_signals()
        this->show_mainwindow();
     });
 
+    //转发送到login.cpp
+    connect(m_stu_pwd, &Stu_Pwd::check_before_pwd, [=]()
+    {
+        emit check_before_pwd();
+    });
 
+    //修改密码成功
+    connect(m_stu_pwd, &Stu_Pwd::save_updated_pwd_to_server, [=]()
+    {
+        emit save_updated_pwd_to_server();
+        save_personal_pwd_to_server();
+    });
+
+    //修改密码界面返回到主界面
+    connect(m_stu_pwd, &Stu_Pwd::back_to_mainwindow, [=]()
+    {
+       m_stu_pwd->hide();
+       this->show_mainwindow();
+    });
 
     // 切换用户
     connect(ui->change_user_btn, &QToolButton::clicked, [=]()
     {
         int choose;
-        choose=QMessageBox::question(this, tr("退出登录"),
-                                     QString(tr("确认退出登录?")),
+        choose=QMessageBox::question(this, tr("切换用户"),
+                                     QString(tr("确认退出登录切换用户?")),
                                      QMessageBox::Yes | QMessageBox::No);
-      if (choose== QMessageBox::No)
-       {
-            //什么都不做
-      }
-      else if (choose== QMessageBox::Yes)
-      {
-        cout << "bye bye...";
-        login_again(); //程序退出
-      }
+        if (choose== QMessageBox::Yes)
+        {
+            cout << "bye bye...";
+            login_again(); //返回到登录界面
+        }
 
     });
 
-    //个人信息
-    connect(ui->stu_info_list_btn, &QToolButton::clicked, [=](){
-        this->hide();
-        m_stu_info->show_mainwindow(m_password, m_name, m_sex, m_academy, m_grade, m_major, m_class, m_tell, m_qq);
+    //退出按钮
+    connect(ui->stu_exit_btn, &QToolButton::clicked, [=]()
+    {
+        int choose;
+        choose=QMessageBox::question(this, tr("退出登录"),
+                                     QString(tr("确认退出登录?")),
+                                     QMessageBox::Yes | QMessageBox::No);
+        if (choose== QMessageBox::Yes)
+        {
+            cout << "bye bye...";
+            this->close(); //程序退出
+        }
     });
 
     //隐藏按钮
@@ -123,6 +134,7 @@ void Stu_Mainwindow::manage_signals()
             setWindowState( Qt::WindowMinimized );
         }
     });
+
     //关闭按钮
     connect(ui->close_btn,&QToolButton::clicked,[=](){
         this->close();
@@ -146,6 +158,10 @@ void Stu_Mainwindow::manage_signals()
 
 }
 
+
+/**
+ * @brief Stu_Mainwindow::login_again 切换用户，重新登录
+ */
 void Stu_Mainwindow::login_again()
 {
     this->hide();
@@ -153,27 +169,33 @@ void Stu_Mainwindow::login_again()
 
 }
 
+
+/**
+ * @brief Stu_Mainwindow::ui_set 设置一些菜单等
+ */
 void Stu_Mainwindow::ui_set()
 {
     //设置工具栏的下拉列表
-//    m_stu_info_menu = new QMenu();
-//    m_change_user_menu = new QMenu();
-//    m_stu_exit_menu = new QMenu();
-//    QAction *stu_info = new QAction (m_stu_info_menu);
-//    QAction *stu_change_user = new QAction (m_change_user_menu);
-//    QAction *stu_exit = new QAction (m_stu_exit_menu);
+    m_stu_info_menu = new QMenu();
+    QAction *stu_info = new QAction (m_stu_info_menu);
+    QAction *stu_pwd = new QAction (m_stu_info_menu);
 
-//    stu_info->setText(QObject::tr("个人信息"));
-//    stu_change_user->setText(QObject::tr("切换用户"));
-//    stu_exit->setText(QObject::tr("退出登录"));
+    stu_info->setText(QObject::tr("个人信息"));
+    stu_pwd->setText(QObject::tr("修改密码"));
+    m_stu_info_menu->addAction(stu_info);
+    m_stu_info_menu->addAction(stu_pwd);
 
-//    m_stu_info_menu->addAction(stu_info);
-//    m_change_user_menu->addAction(stu_change_user);
-//    m_stu_exit_menu->addAction(stu_exit);
+    ui->stu_info_list_btn->setMenu(m_stu_info_menu);
 
-//    ui->stu_info_list_btn->setMenu(m_stu_info_menu);
-//    ui->change_user_btn->setMenu(m_change_user_menu);
-//    ui->stu_exit_btn->setMenu(m_stu_exit_menu);
+    connect(stu_info,&QAction::triggered,[=](){
+        this->hide();
+        m_stu_info->show_mainwindow(m_password, m_name, m_sex, m_academy, m_grade, m_major, m_class, m_tell, m_qq, m_completed_info);
+    });//stu_info界面跳出
+
+    connect(stu_pwd,&QAction::triggered,[=](){
+        this->hide();
+        m_stu_pwd->show_mainwindow(m_password);
+    });//stu_pwd界面跳出
 
 //    QIcon icon;
 //    icon = style()->standardIcon( QStyle::SP_TitleBarMinButton );
@@ -187,6 +209,10 @@ void Stu_Mainwindow::ui_set()
 //    }
 }
 
+
+/**
+ * @brief Stu_Mainwindow::acquire_user_data 请求服务器初始化用户数据
+ */
 void Stu_Mainwindow::acquire_user_data()
 {
     QByteArray postData = set_user_data_json();
@@ -202,6 +228,11 @@ void Stu_Mainwindow::acquire_user_data()
     qDebug()<<"发送数据包";
 }
 
+
+/**
+ * @brief Stu_Mainwindow::set_user_data_json 设置发送给服务器的用户以及请求获取用户数据
+ * return 要发送给服务器的json数据包
+ */
 QByteArray Stu_Mainwindow::set_user_data_json()
 {
     QMap<QString, QVariant> login;
@@ -223,10 +254,14 @@ QByteArray Stu_Mainwindow::set_user_data_json()
     return jsonDocument.toJson();
 }
 
+
+/**
+ * @brief Stu_Mainwindow::save_personal_info_to_server 连接服务器保存修改后的个人信息
+ */
 void Stu_Mainwindow::save_personal_info_to_server()
 {
     //修改类成员变量
-    m_stu_info->updated_info_return(m_name,m_sex,m_academy,m_grade,m_major,m_class,m_tell,m_qq);
+    m_stu_info->updated_info_return(m_name,m_sex,m_academy,m_grade,m_major,m_class,m_tell,m_qq, m_completed_info);
     QByteArray postData = set_personal_info_json();
 
     this->m_tcpSocket = new QTcpSocket(this);
@@ -240,6 +275,11 @@ void Stu_Mainwindow::save_personal_info_to_server()
     qDebug()<<"发送保存个人信息数据包";
 }
 
+
+/**
+ * @brief Stu_Mainwindow::set_personal_info_json 设置发送给服务器的用户个人信息数据
+ * return 要发送给服务器的json数据包
+ */
 QByteArray Stu_Mainwindow::set_personal_info_json()
 {
     QMap<QString, QVariant> info;
@@ -271,22 +311,102 @@ QByteArray Stu_Mainwindow::set_personal_info_json()
     return jsonDocument.toJson();
 }
 
+
+/**
+ * @brief Stu_Mainwindow::save_personal_pwd_to_server 连接服务器保存修改后的密码
+ */
+void Stu_Mainwindow::save_personal_pwd_to_server()
+{
+    //修改类成员变量
+    m_stu_pwd->updated_pwd_return(m_password);
+    QByteArray postData = set_personal_pwd_json();
+    this->m_tcpSocket = new QTcpSocket(this);
+    this->m_tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
+                                //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
+    this->m_tcpSocket->connectToHost(m_ip,8888);
+    connect(this->m_tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_messages()));
+    bool suc = this->m_tcpSocket->waitForConnected();
+    qDebug()<<suc;
+    this->m_tcpSocket->write(postData,postData.length());//发送保存个人信息到服务器数据包
+    qDebug()<<"发送保存密码数据包";
+}
+
+
+/**
+ * @brief Stu_Mainwindow::set_personal_pwd_json 设置发送给服务器的用户修改后的密码
+ * return 要发送给服务器的json数据包
+ */
+QByteArray Stu_Mainwindow::set_personal_pwd_json()
+{
+    QMap<QString, QVariant> info;
+    info.insert("sender", "student");            //用户类别
+    info.insert("service", "save_personal_pwd_to_server"); //请求的服务
+    info.insert("user", m_user);                 //请求服务的用户
+    info.insert("pwd", m_password);
+    /*json数据如
+        {
+            sender:xxxx,
+            service:xxxx,
+            user:xxx
+            ...
+        }
+    */
+    QJsonDocument jsonDocument = QJsonDocument::fromVariant(info);
+    if(jsonDocument.isNull()){
+        cout << " jsonDocument.isNull() ";
+        return "";
+    }
+    return jsonDocument.toJson();
+}
+
+
+/**
+ * @brief Stu_Mainwindow::return_stu_pwd_window 为了返回给login.cpp的修改密码界面对象（因为需要在login.cpp对密码进行加密）
+ * return 学生修改密码界面的窗口对象
+ */
+Stu_Pwd* Stu_Mainwindow::return_stu_pwd_window(){
+    return m_stu_pwd;
+}
+
+
+/**
+ * @brief Stu_Mainwindow::read_back_messages 读取服务器返回的用户数据json包
+ */
 void Stu_Mainwindow::read_back_messages()
 {
     QByteArray alldata = this->m_tcpSocket->readAll();
     QByteArray back_buf = alldata;
     qDebug()<<"back_buf:"<<back_buf;
 
-
     //获取事件处理的返回信息
     QString service;
     get_back_json(back_buf,service, m_password, m_name, m_sex, m_academy, m_grade, m_major, m_class, m_tell, m_qq, m_course_number, m_completed_info);
     if(service == "acquire_user_data"){
-        qDebug()<<m_name<<""<<m_academy<<""<<m_grade;
+        if(!m_completed_info){         //个人信息没有完善
+            int choose;
+            choose=QMessageBox::warning(this, tr("提示"),
+                                         QString(tr("完善个人信息后才可进行其它操作！\n现在是否去完善个人信息？")),
+                                         QMessageBox::Yes | QMessageBox::No);
+          if (choose== QMessageBox::No)
+           {
+              emit change_user();
+                //什么都不做
+          }
+          else if (choose== QMessageBox::Yes)
+          {
+            cout << "去完善个人信息...";
+            this->hide();
+            m_stu_info->show_mainwindow(m_password, m_name, m_sex, m_academy, m_grade, m_major, m_class, m_tell, m_qq, m_completed_info);
+          }
+        }
     }
 }
 
 
+/**
+ * @brief Stu_Mainwindow::read_back_messages 解析服务器返回的用户数据json包
+ * @param back_buf, service... 缓冲区以及需要解析出来的json包里的内容
+ */
 void Stu_Mainwindow::get_back_json(QByteArray back_buf, QString &service, QString &pwd, QString &name, QString &sex,
                     QString &academy, QString &grade, QString &major, QString &clas,
                                    QString &tell, QString &qq, int &course_number, bool &completed_info)
@@ -372,8 +492,9 @@ void Stu_Mainwindow::get_back_json(QByteArray back_buf, QString &service, QStrin
             }
             if (object.contains("completed_info")) {
                 QJsonValue value = object.value("completed_info");
-                if (value.isString()) {
+                if (value.isBool()) {
                     completed_info = value.toBool();
+                    qDebug()<<"client1"<<completed_info;
                 }
             }
 

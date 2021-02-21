@@ -18,23 +18,33 @@ Stu_Login_Instance::~Stu_Login_Instance()
 
 }
 
-//把复制构造函数和=操作符也设为私有,防止被复制
+/**
+ * @brief Stu_Login_Instance::Stu_Login_Instance 把复制构造函数和=操作符也设为私有,防止被复制
+ */
 Stu_Login_Instance::Stu_Login_Instance(const Stu_Login_Instance& )
 {
 }
+
 
 Stu_Login_Instance& Stu_Login_Instance::operator=(const Stu_Login_Instance&)
 {
     return *this;
 }
 
-//获取唯一的实例
+
+/**
+ * @brief Stu_Login_Instance::getInstance 获取唯一的实例
+ * @return m_instance 唯一实例
+ */
 Stu_Login_Instance *Stu_Login_Instance::getInstance()
 {
     return m_instance;
 }
 
-//释放堆区空间
+
+/**
+ * @brief Stu_Login_Instance::destroy 释放堆区空间
+ */
 void Stu_Login_Instance::destroy()
 {
     if(NULL != Stu_Login_Instance::m_instance)
@@ -46,27 +56,40 @@ void Stu_Login_Instance::destroy()
     }
 }
 
-//设置登录信息
-void Stu_Login_Instance::set_login_info( QString current_user, QString ip, QString port)
+
+/**
+ * @brief Stu_Login_Instance::set_login_info 设置登录信息
+ * @param user, ip, port 设置用户的id,ip和port
+ */
+void Stu_Login_Instance::set_login_info( QString user, QString ip, QString port)
 {
-    m_user = current_user;
+    m_user = user;
     m_ip = ip;
     m_port = port;
 }
 
-//获取登录用户
+
+/**
+ * @brief Stu_Login_Instance::get_user 获取登录id
+ */
 QString Stu_Login_Instance::get_user() const
 {
     return m_user;
 }
 
-//获取登录ip
+
+/**
+ * @brief Stu_Login_Instance::get_ip 获取登录ip
+ */
 QString Stu_Login_Instance::get_ip() const
 {
     return m_ip;
 }
 
-//获取登录port
+
+/**
+ * @brief Stu_Login_Instance::get_port 获取登录port
+ */
 QString Stu_Login_Instance::get_port() const
 {
     return m_port;

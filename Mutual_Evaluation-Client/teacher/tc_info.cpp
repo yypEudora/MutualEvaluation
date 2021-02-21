@@ -40,13 +40,13 @@ void Tc_Info::manage_signals()
 
 void Tc_Info::set_ui()
 {
-    //缩小按钮
-    QIcon icon;
-    icon = style()->standardIcon( QStyle::SP_TitleBarMinButton);
-    ui->hide_btn->setIcon(icon);
-    //关闭按钮
-    icon = style()->standardIcon(QStyle::SP_TitleBarCloseButton);
-    ui->close_btn->setIcon(icon);
+//    //缩小按钮
+//    QIcon icon;
+//    icon = style()->standardIcon( QStyle::SP_TitleBarMinButton);
+//    ui->hide_btn->setIcon(icon);
+//    //关闭按钮
+//    icon = style()->standardIcon(QStyle::SP_TitleBarCloseButton);
+//    ui->close_btn->setIcon(icon);
 }
 
 void Tc_Info::mousePressEvent(QMouseEvent *event)
