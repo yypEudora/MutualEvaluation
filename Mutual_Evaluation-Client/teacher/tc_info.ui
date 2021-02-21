@@ -78,7 +78,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_9">
        <item row="1" column="1">
-        <widget class="QLabel" name="hint_label">
+        <widget class="QLabel" name="tc_warning_label">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -280,7 +280,7 @@ border-left-width:0px;</string>
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="QLineEdit" name="tc_dep_tx">
+        <widget class="QLineEdit" name="tc_academy_tx">
          <property name="minimumSize">
           <size>
            <width>90</width>
@@ -311,7 +311,7 @@ border-left-width:0px;</string>
         </widget>
        </item>
        <item row="4" column="2">
-        <widget class="QLineEdit" name="tc_pn_tx">
+        <widget class="QLineEdit" name="tc_tell_tx">
          <property name="styleSheet">
           <string notr="true">background:transparent;
 border-color:#a4ccd4;

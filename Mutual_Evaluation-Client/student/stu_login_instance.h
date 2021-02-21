@@ -5,7 +5,7 @@
 #include "common/common.h"
 
 
-//单例模式，主要保存当前登陆用户，服务器信息
+//单例模式，主要保存当前登录学生用户，服务器信息
 class Stu_Login_Instance
 {
 public:
@@ -45,7 +45,7 @@ private:
     static Stu_Login_Instance *m_instance;
 
 
-    QString m_user;   //当前登陆用户
+    QString m_user;   //当前登录用户
     QString m_ip;
     QString m_port;
 };

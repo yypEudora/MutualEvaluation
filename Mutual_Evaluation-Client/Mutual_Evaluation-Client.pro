@@ -24,6 +24,7 @@ SOURCES += \
     student/stu_mainwindow.cpp \
     student/stu_pwd.cpp \
     teacher/tc_info.cpp \
+    teacher/tc_login_instance.cpp \
     teacher/tc_mainwindow.cpp \
     teacher/tc_pwd.cpp \
     titlewg.cpp \
@@ -38,6 +39,7 @@ HEADERS += \
     student/stu_mainwindow.h \
     student/stu_pwd.h \
     teacher/tc_info.h \
+    teacher/tc_login_instance.h \
     teacher/tc_mainwindow.h \
     teacher/tc_pwd.h \
     titlewg.h \

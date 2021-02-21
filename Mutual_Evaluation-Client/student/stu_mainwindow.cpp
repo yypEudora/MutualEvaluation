@@ -65,7 +65,7 @@ void Stu_Mainwindow::show_mainwindow()
  */
 void Stu_Mainwindow::manage_signals()
 {
-    //个人信息保存成功，修改back_to_mainwindow的值
+    //个人信息保存成功，修改m_completed_info的值
     connect(m_stu_info, &Stu_Info::save_updated_info_to_server, [=]()
     {
         m_completed_info = true;
@@ -79,13 +79,13 @@ void Stu_Mainwindow::manage_signals()
        this->show_mainwindow();
     });
 
-    //转发送到login.cpp
+    //转发送到login.cpp进行加密
     connect(m_stu_pwd, &Stu_Pwd::check_before_pwd, [=]()
     {
         emit check_before_pwd();
     });
 
-    //修改密码成功
+    //修改密码成功，转发送到login.cpp进行加密
     connect(m_stu_pwd, &Stu_Pwd::save_updated_pwd_to_server, [=]()
     {
         emit save_updated_pwd_to_server();
@@ -179,12 +179,10 @@ void Stu_Mainwindow::ui_set()
     m_stu_info_menu = new QMenu();
     QAction *stu_info = new QAction (m_stu_info_menu);
     QAction *stu_pwd = new QAction (m_stu_info_menu);
-
     stu_info->setText(QObject::tr("个人信息"));
     stu_pwd->setText(QObject::tr("修改密码"));
     m_stu_info_menu->addAction(stu_info);
     m_stu_info_menu->addAction(stu_pwd);
-
     ui->stu_info_list_btn->setMenu(m_stu_info_menu);
 
     connect(stu_info,&QAction::triggered,[=](){
