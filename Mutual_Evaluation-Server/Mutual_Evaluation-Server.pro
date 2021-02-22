@@ -13,7 +13,9 @@ SOURCES += \
     dealRegist.cpp \
     main.cpp \
     mainwindow.cpp \
-    mysql.cpp \
+    mysql/mysql_main.cpp \
+    mysql/stu_mysql/stu_info_mysql.cpp \
+    mysql/tc_mysql/tc_info_mysql.cpp \
     student/deal_stu_info.cpp \
     student/stu_main.cpp \
     teacher/deal_tc_info.cpp \
@@ -23,8 +25,10 @@ HEADERS += \
     dealLogin.h \
     dealRegist.h \
     mainwindow.h \
+    mysql/mysql_main.h \
+    mysql/stu_mysql/stu_info_mysql.h \
+    mysql/tc_mysql/tc_info_mysql.h \
     student/dealRegist.h \
-    mysql.h \
     student/deal_stu_info.h \
     student/stu_main.h \
     teacher/deal_tc_info.h \

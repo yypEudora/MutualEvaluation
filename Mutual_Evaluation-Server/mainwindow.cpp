@@ -159,7 +159,7 @@ void MainWindow::read_regist_messages(QByteArray send_buf, QString current_user)
  * @param send_buf 客户端发送过来的数据
  */
 void MainWindow::read_student_messages(QByteArray send_buf){
-    Stu_Main stu_main{m_tcpSocket, m_mysql};
+    Stu_Main stu_main{m_tcpSocket};
     stu_main.read_service_messages(send_buf);
 }
 
@@ -169,7 +169,7 @@ void MainWindow::read_student_messages(QByteArray send_buf){
  * @param send_buf 客户端发送过来的数据
  */
 void MainWindow::read_teacher_messages(QByteArray send_buf){
-    Tc_Main tc_main{m_tcpSocket, m_mysql};
+    Tc_Main tc_main{m_tcpSocket};
     tc_main.read_service_messages(send_buf);
 }
 

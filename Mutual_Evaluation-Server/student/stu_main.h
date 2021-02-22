@@ -1,14 +1,21 @@
+/*
+ * stu_main.h
+ * 1.解析学生用户在客户端发送过来的想要请求的服务信息json包->然后以不同的任务调用不同的函数
+ * 2.被引用：mainwindow.h
+ */
+
+
 #ifndef STU_MAIN_H
 #define STU_MAIN_H
 
 #include <QTcpSocket>
 #include <QSqlDatabase>
-#include "mysql.h"
+#include "mysql/stu_mysql/stu_info_mysql.h"
 
 class Stu_Main
 {
 public:
-    Stu_Main(QTcpSocket *tcpSocket, MYSQL mysql);
+    Stu_Main(QTcpSocket *tcpSocket);
     ~Stu_Main();
 
 
@@ -24,7 +31,7 @@ public slots:
 
 
 private:
-    MYSQL m_mysql; //数据库
+    Stu_Info_MYSQL m_info_mysql; //处理学生信息相关
     QTcpSocket *m_tcpSocket;//连接进服务器的套接字
 };
 

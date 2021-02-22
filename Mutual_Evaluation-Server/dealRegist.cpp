@@ -7,7 +7,7 @@
 using std::cout;
 
 
-DealRegist::DealRegist(QTcpSocket *tcpSocket, MYSQL mysql){
+DealRegist::DealRegist(QTcpSocket *tcpSocket, MYSQL_Main mysql){
     m_tcpSocket = tcpSocket;
     m_mysql = mysql;
 }

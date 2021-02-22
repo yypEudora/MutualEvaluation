@@ -1,14 +1,22 @@
+/*
+ * deal_stu_info.h
+ * 1.处理学生用户数据和个人信息相关：登录时初始化用户数据，保存修改的个人信息，保存修改的密码
+ * 2.设置客户端请求服务的反馈信息的json数据包，发送客户端请求服务反馈信息的json数据包
+ * 3.被引用：stu_main.h
+ */
+
+
 #ifndef DEAL_STU_INFO_H
 #define DEAL_STU_INFO_H
 
 #include <QTcpSocket>
 #include <QSqlDatabase>
-#include "mysql.h"
+#include "mysql/stu_mysql/stu_info_mysql.h"
 
 class Deal_Stu_Info
 {
 public:
-    Deal_Stu_Info(QTcpSocket *tcpSocket, MYSQL mysql);
+    Deal_Stu_Info(QTcpSocket *tcpSocket, Stu_Info_MYSQL info_mysql);
     ~Deal_Stu_Info();
 
     //处理初始化用户数据
@@ -23,11 +31,12 @@ public:
                                       QString clas, QString tell, QString qq);
 
     //保存修改过的密码
-    void save_personal_pwd_to_server(QString current_user, QString user, QString pwd);
+    void save_personal_pwd_to_server(QString user, QString pwd);
+
+    //发送客户端请求服务反馈信息的json数据包
+    void send_service_messages(QByteArray postData);
 
 
-
-    void send_service_messages(QByteArray postData); //发送客户端请求服务反馈信息的json数据包
     //设置客户端请求服务的反馈信息的json数据包
     QByteArray set_user_data_back_json(QString pwd, QString name, QString sex,
                                        QString academy, QString grade, QString major, QString clas,
@@ -40,7 +49,7 @@ public slots:
 
 
 private:
-    MYSQL m_mysql; //数据库
+    Stu_Info_MYSQL m_info_mysql; //处理学生信息相关
     QTcpSocket *m_tcpSocket;//连接进服务器的套接字
 };
 

@@ -1,4 +1,4 @@
-#include "mysql.h"
+#include "mysql_main.h"
 #include <QNetworkInterface>
 #include <QtSql>
 #include <QCoreApplication>
@@ -15,9 +15,11 @@
 
 using std::cout;
 
-MYSQL::MYSQL()
+MYSQL_Main::MYSQL_Main()
 {
     QLoggingCategory::defaultCategory()->setEnabled(QtDebugMsg, true);
+
+//应在mainwindow.cpp初调用
 //    connect_mysql();
 //    create_database();
 //    init_database();
@@ -30,15 +32,15 @@ MYSQL::MYSQL()
 //    }
 }
 
-MYSQL::~MYSQL()
+MYSQL_Main::~MYSQL_Main()
 {
     m_database.close();
 }
 
 /**
- * @brief MYSQL::connect_mysql 连接到数据库
+ * @brief MYSQL_Main::connect_mysql 连接到数据库
  */
-void MYSQL::connect_mysql()
+void MYSQL_Main::connect_mysql()
 {
     if (QSqlDatabase::contains("testConnect"))//判断testConnect连接是否存在并连接
     {
@@ -64,9 +66,9 @@ void MYSQL::connect_mysql()
 
 //创建数据库、数据表
 /**
- * @brief MYSQL::create_database 如果没有指定数据库和表则创建
+ * @brief MYSQL_Main::create_database 如果没有指定数据库和表则创建
  */
-void MYSQL::create_database()
+void MYSQL_Main::create_database()
 {
     QString querystring;
     //创建数据库
@@ -99,9 +101,9 @@ void MYSQL::create_database()
 }
 
 /**
- * @brief MYSQL::init_database 初始化数据库（添加原始值）
+ * @brief MYSQL_Main::init_database 初始化数据库（添加原始值）
  */
-void MYSQL::init_database()
+void MYSQL_Main::init_database()
 {
     QSqlQuery query(m_database);
     query.exec("insert into Student_Info values('2017051604056', '123123', '小洋芋', '女','计算机与信息科学学院','2017级','软件工程','2班','13101291635','791188918', 0, 'false')");
@@ -116,11 +118,11 @@ void MYSQL::init_database()
 
 
 /**
- * @brief MYSQL::user_is_exist 查询用户是否存在
+ * @brief MYSQL_Main::user_is_exist 查询用户是否存在
  * @param current_user,user 查询哪张用户表，欲查询的用户
  * @return 用户存在，返回true；否则，返回false。
  */
-bool MYSQL::user_is_exist(QString current_user, QString user)
+bool MYSQL_Main::user_is_exist(QString current_user, QString user)
 {
     connect_mysql();
     //createDB();
@@ -163,11 +165,11 @@ bool MYSQL::user_is_exist(QString current_user, QString user)
 
 
 /**
- * @brief MYSQL::password_is_correct 查询用户密码是否正确
+ * @brief MYSQL_Main::password_is_correct 查询用户密码是否正确
  * @param current_user, user，pwd 查询哪张用户表，欲查询的用户,用户密码
  * @return 密码正确，返回true；否则，返回false。
  */
-bool MYSQL::password_is_correct(QString current_user, QString user, QString pwd){
+bool MYSQL_Main::password_is_correct(QString current_user, QString user, QString pwd){
     connect_mysql();
     //createDB();
     QSqlQuery query(m_database);
@@ -199,7 +201,7 @@ bool MYSQL::password_is_correct(QString current_user, QString user, QString pwd)
                 //qDebug() << "user: "<< user;
                 //产生token码,QString转char*类型
                 set_token(pwd,token);
-                qDebug()<<"用户存在----"<<"\n正确密码是："<<get_str_md5(tmp_pwd)<<"\n输入密码是"<<get_str_md5(pwd);
+                qDebug()<<"用户存在----"<<"\n正确密码是："<<tmp_pwd<<"\n输入密码是"<<pwd;
                 return true;    //密码正确
             }
             qDebug()<<"用户存在----"<<"\n正确密码是："<<tmp_pwd<<"\n输入密码是"<<pwd;
@@ -212,10 +214,10 @@ bool MYSQL::password_is_correct(QString current_user, QString user, QString pwd)
 
 
 /**
- * @brief MYSQL::regist_success 将注册成功的用户写到数据库
+ * @brief MYSQL_Main::regist_success 将注册成功的用户写到数据库
  * @param current_user, user，nick_name, pwd, tel, email 注册到哪张用户表，注册的用户信息
  */
-void MYSQL::regist_success(QString current_user, QString user, QString pwd)
+void MYSQL_Main::regist_success(QString current_user, QString user, QString pwd)
 {
     QSqlQuery query(m_database);
     QString cmd;
@@ -242,202 +244,11 @@ void MYSQL::regist_success(QString current_user, QString user, QString pwd)
 
 
 /**
- * @brief MYSQL::init_stu_data 用于学生用户登录后初始化用户的数据
- * @param user... 欲查询的用户的个人数据
- */
-void MYSQL::init_stu_data(QString user, QString &pwd, QString &name, QString &sex,
-                    QString &academy, QString &grade, QString &major, QString &clas,
-                    QString &tell, QString &qq, int &course_number, bool &completed_info)
-{
-    connect_mysql();
-    QSqlQuery query(m_database);
-    QString cmd;
-
-    cmd ="select * from Student_Info where Id='"+user+"'";
-
-
-    qDebug()<<"命令是" << cmd;
-    query.exec(cmd);
-    QString if_completed; //数据表中此字段是vchar类型
-    while(query.next()) {
-        pwd = query.value(1).toString();
-        name = query.value(2).toString();
-        sex = query.value(3).toString();
-        academy = query.value(4).toString();
-        grade = query.value(5).toString();
-        major = query.value(6).toString();
-        clas = query.value(7).toString();
-        tell = query.value(8).toString();
-        qq = query.value(9).toString();
-        course_number = query.value(10).toInt();
-        if_completed = query.value(11).toString();
-        if(if_completed == "true")
-            completed_info = true;
-        else
-            completed_info = false;
-    }
-}
-
-
-/**
- * @brief MYSQL::save_stu_info 将学生用户修改过后的个人信息写到服务器
- * @param user... 欲保存的用户的个人数据
- */
-//测试使用，数据库命令需要改进
-void MYSQL::save_stu_info(QString user, QString name, QString sex,
-                           QString academy, QString grade, QString major, QString clas,
-                           QString tell, QString qq)
-{
-    connect_mysql();
-    QSqlQuery query(m_database);
-    QString cmd;
-    QString cmd1;
-    QString cmd2;
-    QString cmd3;
-    QString cmd4;
-    QString cmd5;
-    QString cmd6;
-    QString cmd7;
-    QString cmd8;
-    QString if_completed="true";//数据表中是以vchar类型存储的
-
-    cmd = "update Student_Info set Name='"+name+"' where Id='"+user+"'";
-    cmd1 = "update Student_Info set Sex='"+sex+"' where Id='"+user+"'";
-    cmd2 = "update Student_Info set Academy='"+academy+"' where Id='"+user+"'";
-    cmd3 = "update Student_Info set Grade='"+grade+"' where Id='"+user+"'";
-    cmd4 = "update Student_Info set Major='"+major+"' where Id='"+user+"'";
-    cmd5 = "update Student_Info set Class='"+clas+"' where Id='"+user+"'";
-    cmd6 = "update Student_Info set Tell='"+tell+"' where Id='"+user+"'";
-    cmd7 = "update Student_Info set QQ='"+qq+"' where Id='"+user+"'";
-    cmd8 = "update Student_Info set IfCompleteInfo='"+if_completed+"' where Id='"+user+"'";
-
-        //cmd = "update Student_Info set Name='"+name+"',Sex='"+sex+"',Academy='"+academy+"',Grade='"+grade+"',Major='"+major+"',Class='"+clas+"',Tell='"+tell+"',QQ='"+qq+"',IfCompletedInfo='"+if_complete+"'"+" where Id='"+user+"'";
-        //cmd = "update Student_Info set 'Name'='"+name+"','Sex'='"+sex+"','Academy'='"+academy+"','Grade'='"+grade+"','Major'='"+major+"','Class'='"+clas+"','Tell'='"+tell+"','QQ'='"+qq+"','IfCompletedInfo'='"+if_complete+"'"+" where Id='"+user+"'";
-        //cmd="update Student_Info set 'Name'='"+name;
-
-    qDebug()<<"命令是" << cmd;
-    query.exec(cmd);
-    query.exec(cmd1);
-    query.exec(cmd2);
-    query.exec(cmd3);
-    query.exec(cmd4);
-    query.exec(cmd5);
-    query.exec(cmd6);
-    query.exec(cmd7);
-    query.exec(cmd8);
-}
-
-
-/**
- * @brief MYSQL::init_tc_data 用于教师用户登录后初始化用户的数据
- * @param user... 欲查询的用户的个人数据
- */
-void MYSQL::init_tc_data(QString user, QString &pwd, QString &name, QString &sex,
-                         QString &academy, QString &email, QString &tell, QString &qq,
-                         int &course_number, bool &completed_info)
-{
-    connect_mysql();
-    QSqlQuery query(m_database);
-    QString cmd;
-
-    cmd ="select * from Teacher_Info where Id='"+user+"'";
-
-
-    qDebug()<<"命令是" << cmd;
-    query.exec(cmd);
-    QString if_completed; //数据表中此字段是vchar类型
-    while(query.next()) {
-        pwd = query.value(1).toString();
-        name = query.value(2).toString();
-        sex = query.value(3).toString();
-        academy = query.value(4).toString();
-        email = query.value(5).toString();
-        tell = query.value(6).toString();
-        qq = query.value(7).toString();
-        course_number = query.value(8).toInt();
-        if_completed = query.value(9).toString();
-        if(if_completed == "true")
-            completed_info = true;
-        else
-            completed_info = false;
-    }
-}
-
-
-/**
- * @brief MYSQL::save_tc_info 将教师用户修改过后的个人信息写到服务器
- * @param user... 欲保存的用户的个人数据
- */
-//测试使用，数据库命令需要改进
-void MYSQL::save_tc_info(QString user, QString name, QString sex, QString academy,
-                         QString email, QString tell, QString qq)
-{
-    connect_mysql();
-    QSqlQuery query(m_database);
-    QString cmd;
-    QString cmd1;
-    QString cmd2;
-    QString cmd3;
-    QString cmd4;
-    QString cmd5;
-    QString cmd6;
-
-    QString if_completed="true";//数据表中是以vchar类型存储的
-
-    cmd = "update Teacher_Info set Name='"+name+"' where Id='"+user+"'";
-    cmd1 = "update Teacher_Info set Sex='"+sex+"' where Id='"+user+"'";
-    cmd2 = "update Teacher_Info set Academy='"+academy+"' where Id='"+user+"'";
-    cmd3 = "update Teacher_Info set Email='"+email+"' where Id='"+user+"'";
-    cmd4 = "update Teacher_Info set Tell='"+tell+"' where Id='"+user+"'";
-    cmd5 = "update Teacher_Info set QQ='"+qq+"' where Id='"+user+"'";
-    cmd6 = "update Teacher_Info set IfCompleteInfo='"+if_completed+"' where Id='"+user+"'";
-
-        //cmd = "update Student_Info set Name='"+name+"',Sex='"+sex+"',Academy='"+academy+"',Grade='"+grade+"',Major='"+major+"',Class='"+clas+"',Tell='"+tell+"',QQ='"+qq+"',IfCompletedInfo='"+if_complete+"'"+" where Id='"+user+"'";
-        //cmd = "update Student_Info set 'Name'='"+name+"','Sex'='"+sex+"','Academy'='"+academy+"','Grade'='"+grade+"','Major'='"+major+"','Class'='"+clas+"','Tell'='"+tell+"','QQ'='"+qq+"','IfCompletedInfo'='"+if_complete+"'"+" where Id='"+user+"'";
-        //cmd="update Student_Info set 'Name'='"+name;
-
-    qDebug()<<"命令是" << cmd;
-    query.exec(cmd);
-    query.exec(cmd1);
-    query.exec(cmd2);
-    query.exec(cmd3);
-    query.exec(cmd4);
-    query.exec(cmd5);
-    query.exec(cmd6);
-}
-
-
-
-/**
- * @brief MYSQL::save_user_pwd 将修改过后的密码写到服务器
- * @param current_user, user, pwd 保存到哪张用户表，欲保存的用户的密码
- */
-void MYSQL::save_user_pwd(QString current_user, QString user, QString pwd)
-{
-    connect_mysql();
-    QSqlQuery query(m_database);
-    QString cmd;
-
-    if(current_user == "student")
-        cmd = "update Student_Info set Password='"+pwd+"' where Id='"+user+"'";
-    else if(current_user == "teacher")
-        cmd = "update Teacher_Info set Password='"+pwd+"' where Id='"+user+"'";
-
-    else if(current_user == "zhujiao")
-        cmd = "update Zhujiao_Info set Password='"+pwd+"' where Id='"+user+"'";
-
-    qDebug()<<"命令是" << cmd;
-    query.exec(cmd);
-}
-
-
-
-/**
- * @brief MYSQL::set_token 产生token码,QString转char*类型
+ * @brief MYSQL_Main::set_token 产生token码,QString转char*类型
  * @param user，token 用户
  * @return redis连接成功，返回true；否则，返回false。
  */
-int MYSQL::set_token(const char* user, char *token)
+int MYSQL_Main::set_token(const char* user, char *token)
 {
     //链接redis
     redisContext* pRedisContext=(redisContext*)redisConnect("127.0.0.1",6379);
@@ -479,26 +290,12 @@ int MYSQL::set_token(const char* user, char *token)
 }
 
 
-/**
- * @brief MYSQL::get_str_md5 将某个字符串加密成md5码
- * @param str 欲想加密的字符串
- * @return 加密后的字符串
- */
-QString MYSQL::get_str_md5(QString str)
-{
-    QByteArray array;
-    //md5加密
-    array = QCryptographicHash::hash ( str.toLocal8Bit(), QCryptographicHash::Md5 );
-
-    return array.toHex();
-}
-
 
 //创建各种表
 /**
- * @brief MYSQL::create_student_info 创建Student_Info表
+ * @brief MYSQL_Main::create_student_info 创建Student_Info表
  */
-void MYSQL::create_student_info(QString querystring){
+void MYSQL_Main::create_student_info(QString querystring){
     querystring =
             "CREATE TABLE IF NOT EXISTS Mutual_Evaluation.Student_Info\
             (\
@@ -528,9 +325,9 @@ void MYSQL::create_student_info(QString querystring){
 
 
 /**
- * @brief MYSQL::create_teacher_info 创建Teacher_Info表
+ * @brief MYSQL_Main::create_teacher_info 创建Teacher_Info表
  */
-void MYSQL::create_teacher_info(QString querystring){
+void MYSQL_Main::create_teacher_info(QString querystring){
     querystring =
             "CREATE TABLE IF NOT EXISTS Mutual_Evaluation.Teacher_Info\
             (\
@@ -558,9 +355,9 @@ void MYSQL::create_teacher_info(QString querystring){
 
 
 /**
- * @brief MYSQL::create_zhujiao_info 创建Zhujiao_Info表
+ * @brief MYSQL_Main::create_zhujiao_info 创建Zhujiao_Info表
  */
-void MYSQL::create_zhujiao_info(QString querystring){
+void MYSQL_Main::create_zhujiao_info(QString querystring){
     querystring =
             "CREATE TABLE IF NOT EXISTS Mutual_Evaluation.Zhujiao_Info\
             (\

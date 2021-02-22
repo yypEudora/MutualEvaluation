@@ -13,9 +13,9 @@
 
 using std::cout;
 
-Deal_Stu_Info::Deal_Stu_Info(QTcpSocket *tcpSocket, MYSQL mysql){
+Deal_Stu_Info::Deal_Stu_Info(QTcpSocket *tcpSocket, Stu_Info_MYSQL info_mysql){
     m_tcpSocket = tcpSocket;
-    m_mysql = mysql;
+    m_info_mysql = info_mysql;
 }
 
 Deal_Stu_Info::~Deal_Stu_Info(){
@@ -33,7 +33,7 @@ void Deal_Stu_Info::acquire_user_data(QString user, QString pwd, QString name,
                                       bool completed_info)
 {
     QByteArray post_data;
-    m_mysql.init_stu_data(user, pwd,name,sex,academy,grade,major, clas,tell,qq,course_number,completed_info);
+    m_info_mysql.init_stu_data(user, pwd,name,sex,academy,grade,major, clas,tell,qq,course_number,completed_info);
     post_data = set_user_data_back_json(pwd,name,sex,academy,grade,major, clas,tell,qq,course_number,completed_info);
     send_service_messages(post_data);
 }
@@ -47,7 +47,7 @@ void Deal_Stu_Info::save_personal_info_to_server(QString user, QString name,
                                   QString sex, QString academy, QString grade, QString major,
                                   QString clas, QString tell, QString qq)
 {
-    m_mysql.save_stu_info(user, name, sex, academy, grade, major, clas, tell, qq);
+    m_info_mysql.save_stu_info(user, name, sex, academy, grade, major, clas, tell, qq);
 
 }
 
@@ -56,9 +56,9 @@ void Deal_Stu_Info::save_personal_info_to_server(QString user, QString name,
  * @brief Deal_Stu_Info::save_personal_pwd_to_server 保存修改后的密码
  * @param current_user, user... 当前用户类型，请求保存的数据
  */
-void Deal_Stu_Info::save_personal_pwd_to_server(QString current_user, QString user, QString pwd)
+void Deal_Stu_Info::save_personal_pwd_to_server(QString user, QString pwd)
 {
-    m_mysql.save_user_pwd(current_user, user, pwd);
+    m_info_mysql.save_stu_pwd(user, pwd);
 }
 
 
