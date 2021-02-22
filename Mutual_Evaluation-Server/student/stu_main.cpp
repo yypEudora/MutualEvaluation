@@ -14,9 +14,8 @@
 
 using std::cout;
 
-Stu_Main::Stu_Main(QTcpSocket *tcpSocket, MYSQL mysql){
+Stu_Main::Stu_Main(QTcpSocket *tcpSocket){
     m_tcpSocket = tcpSocket;
-    m_mysql = mysql;
 }
 
 Stu_Main::~Stu_Main(){
@@ -47,12 +46,14 @@ void Stu_Main::read_service_messages(QByteArray send_buf)
     int course_number;
     bool completed_info; //是否完善个人信息
 
-    Deal_Stu_Info deal_stu_info{m_tcpSocket, m_mysql};//学生信息相关处理对象
+    Deal_Stu_Info deal_stu_info{m_tcpSocket, m_info_mysql};//学生信息相关处理对象
 
     //获取客户端传来的请求服务信息json包
     get_service_json(temp_buf,service,user, pwd, name,sex,academy, grade, major, clas,tell, qq, completed_info);
 
     QByteArray post_data;
+
+    /*请求用户数据和个人信息相关*/
     if(service == "acquire_user_data")                          //处理初始化用户数据
         deal_stu_info.acquire_user_data(user, pwd,name,sex,academy,grade,major, clas,tell,qq,course_number,completed_info);
     else if(service == "save_personal_info_to_server"){         //保存修改过的个人信息
@@ -60,7 +61,7 @@ void Stu_Main::read_service_messages(QByteArray send_buf)
         completed_info = true;  //为防止后续请求服务中，completed_info仍为false
     }
     else if(service == "save_personal_pwd_to_server")          //保存修改过的密码
-        deal_stu_info.save_personal_pwd_to_server(current_user,user,pwd);
+        deal_stu_info.save_personal_pwd_to_server(user,pwd);
 
 }
 

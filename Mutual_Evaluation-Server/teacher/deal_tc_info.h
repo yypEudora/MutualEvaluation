@@ -1,27 +1,35 @@
+/*
+ * deal_tc_info.h
+ * 1.处理教师用户数据和个人信息相关：登录时初始化用户数据，保存修改的个人信息，保存修改的密码
+ * 2.设置客户端请求服务的反馈信息的json数据包，发送客户端请求服务反馈信息的json数据包
+ * 3.被引用：tc_main.h
+ */
+
+
 #ifndef DEAL_TC_INFO_H
 #define DEAL_TC_INFO_H
 
 #include <QTcpSocket>
 #include <QSqlDatabase>
-#include "mysql.h"
+#include "mysql/tc_mysql/tc_info_mysql.h"
 
 class Deal_Tc_Info
 {
 public:
-    Deal_Tc_Info(QTcpSocket *tcpSocket, MYSQL mysql);
+    Deal_Tc_Info(QTcpSocket *tcpSocket, Tc_Info_MYSQL mysql);
     ~Deal_Tc_Info();
 
     //处理初始化用户数据
-    void acquire_user_data(QString current_user, QString user, QString pwd, QString name,
+    void acquire_user_data(QString user, QString pwd, QString name,
                            QString sex, QString academy, QString email, QString tell, QString qq,
                            int course_number,bool completed_info);
 
     //保存修改过的个人信息
-    void save_personal_info_to_server(QString current_user, QString user, QString name,
+    void save_personal_info_to_server(QString user, QString name,
                                       QString sex, QString academy, QString email, QString tell, QString qq);
 
     //保存修改过的密码
-    void save_personal_pwd_to_server(QString current_user, QString user, QString pwd);
+    void save_personal_pwd_to_server(QString user, QString pwd);
 
 
 
@@ -39,7 +47,7 @@ public slots:
 
 
 private:
-    MYSQL m_mysql; //数据库
+    Tc_Info_MYSQL m_info_mysql; //数据库
     QTcpSocket *m_tcpSocket;//连接进服务器的套接字
 };
 

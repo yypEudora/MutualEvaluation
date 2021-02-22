@@ -13,7 +13,7 @@
 
 using std::cout;
 
-DealLogin::DealLogin(QTcpSocket *tcpSocket, MYSQL mysql){
+DealLogin::DealLogin(QTcpSocket *tcpSocket, MYSQL_Main mysql){
     m_tcpSocket = tcpSocket;
     m_mysql = mysql;
 }

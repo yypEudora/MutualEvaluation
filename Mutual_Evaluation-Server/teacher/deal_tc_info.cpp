@@ -13,9 +13,9 @@
 
 using std::cout;
 
-Deal_Tc_Info::Deal_Tc_Info(QTcpSocket *tcpSocket, MYSQL mysql){
+Deal_Tc_Info::Deal_Tc_Info(QTcpSocket *tcpSocket, Tc_Info_MYSQL info_mysql){
     m_tcpSocket = tcpSocket;
-    m_mysql = mysql;
+    m_info_mysql = info_mysql;
 }
 
 Deal_Tc_Info::~Deal_Tc_Info(){
@@ -27,12 +27,12 @@ Deal_Tc_Info::~Deal_Tc_Info(){
  * @brief Deal_Tc_Info::acquire_user_data 处理初始化学生用户数据
  * @param current_user, user... 当前用户类型，请求保存的数据
  */
-void Deal_Tc_Info::acquire_user_data(QString current_user, QString user, QString pwd, QString name,
+void Deal_Tc_Info::acquire_user_data(QString user, QString pwd, QString name,
                                       QString sex, QString academy, QString email, QString tell,
                                      QString qq, int course_number, bool completed_info)
 {
     QByteArray post_data;
-    m_mysql.init_tc_data(user, pwd,name,sex,academy,email,tell,qq,course_number,completed_info);
+    m_info_mysql.init_tc_data(user, pwd,name,sex,academy,email,tell,qq,course_number,completed_info);
     post_data = set_user_data_back_json(pwd,name,sex,academy,email,tell,qq,course_number,completed_info);
     send_service_messages(post_data);
 }
@@ -42,21 +42,21 @@ void Deal_Tc_Info::acquire_user_data(QString current_user, QString user, QString
  * @brief Deal_Tc_Info::save_personal_info_to_server 保存修改后的个人信息
  * @param current_user, user... 当前用户类型，请求保存的数据
  */
-void Deal_Tc_Info::save_personal_info_to_server(QString current_user, QString user, QString name,
+void Deal_Tc_Info::save_personal_info_to_server(QString user, QString name,
                                   QString sex, QString academy, QString email, QString tell, QString qq)
 {
-    m_mysql.save_tc_info(user, name, sex, academy, email, tell, qq);
+    m_info_mysql.save_tc_info(user, name, sex, academy, email, tell, qq);
 
 }
 
 
 /**
  * @brief Deal_Tc_Info::save_personal_pwd_to_server 保存修改后的密码
- * @param current_user, user... 当前用户类型，请求保存的数据
+ * @param user... 当前用户类型，请求保存的数据
  */
-void Deal_Tc_Info::save_personal_pwd_to_server(QString current_user, QString user, QString pwd)
+void Deal_Tc_Info::save_personal_pwd_to_server(QString user, QString pwd)
 {
-    m_mysql.save_user_pwd(current_user, user, pwd);
+    m_info_mysql.save_tc_pwd(user, pwd);
 }
 
 
