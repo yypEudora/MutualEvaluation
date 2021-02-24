@@ -503,20 +503,8 @@
        <item>
         <widget class="QWidget" name="nmwidget" native="true">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="5" column="1">
-           <widget class="QLabel" name="pwdLogo">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>密码：</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <spacer name="verticalSpacer_46">
+          <item row="2" column="2">
+           <spacer name="verticalSpacer_50">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -524,19 +512,6 @@
              <size>
               <width>20</width>
               <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="3" column="0">
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
              </size>
             </property>
            </spacer>
@@ -562,15 +537,15 @@ border-left-width:0px;</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="3">
-           <spacer name="horizontalSpacer_5">
+          <item row="4" column="2">
+           <spacer name="verticalSpacer_3">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
-              <height>20</height>
+              <width>20</width>
+              <height>40</height>
              </size>
             </property>
            </spacer>
@@ -579,7 +554,7 @@ border-left-width:0px;</string>
            <widget class="QLabel" name="nameLogo">
             <property name="font">
              <font>
-              <pointsize>12</pointsize>
+              <pointsize>11</pointsize>
              </font>
             </property>
             <property name="text">
@@ -587,26 +562,8 @@ border-left-width:0px;</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="2">
-           <widget class="QLineEdit" name="pwd_tx">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background:transparent;
-border-color:#a4ccd4;
-border-style:solid;
-border-top-width:0px;
-border-right-width:0px;
-border-bottom-width:2px;
-border-left-width:0px;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <spacer name="verticalSpacer_50">
+          <item row="1" column="2">
+           <spacer name="verticalSpacer_46">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -631,8 +588,78 @@ border-left-width:0px;</string>
             </property>
            </spacer>
           </item>
-          <item row="4" column="2">
-           <spacer name="verticalSpacer_3">
+          <item row="5" column="1">
+           <widget class="QLabel" name="pwdLogo">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>密码：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="3">
+           <widget class="QPushButton" name="pushButton">
+            <property name="styleSheet">
+             <string notr="true">color:rgb(138, 167, 175);
+background: transparent;
+border-color:#a4ccd4;
+border-style:none;
+</string>
+            </property>
+            <property name="text">
+             <string>忘记密码?</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QLineEdit" name="pwd_tx">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>6</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background:transparent;
+border-color:#a4ccd4;
+border-style:solid;
+border-top-width:0px;
+border-right-width:0px;
+border-bottom-width:2px;
+border-left-width:0px;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2" alignment="Qt::AlignRight">
+           <widget class="QCheckBox" name="remp_btn">
+            <property name="text">
+             <string>记住密码</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="7" column="2">
+           <spacer name="verticalSpacer_48">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -644,15 +671,15 @@ border-left-width:0px;</string>
             </property>
            </spacer>
           </item>
-          <item row="6" column="2">
-           <spacer name="verticalSpacer_48">
+          <item row="5" column="4">
+           <spacer name="horizontalSpacer_4">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>20</width>
-              <height>40</height>
+              <width>40</width>
+              <height>20</height>
              </size>
             </property>
            </spacer>
@@ -1582,7 +1609,7 @@ border-bottom-width:2px;
 border-left-width:0px;</string>
             </property>
             <property name="text">
-             <string>8888</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -1662,7 +1689,7 @@ border-bottom-width:2px;
 border-left-width:0px;</string>
             </property>
             <property name="text">
-             <string>192.168.1.11</string>
+             <string/>
             </property>
            </widget>
           </item>

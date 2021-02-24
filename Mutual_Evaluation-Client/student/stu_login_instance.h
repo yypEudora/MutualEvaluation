@@ -1,3 +1,11 @@
+/*
+ * stu_login_instance.h
+ * 1.简述：学生用户单例模式类
+ * 2.主要功能：设置/获取登录信息
+ * 3.被引用：student文件中的所有头文件
+ */
+
+
 #ifndef STU_LOGIN_INFO_INSTANCE_H
 #define STU_LOGIN_INFO_INSTANCE_H
 

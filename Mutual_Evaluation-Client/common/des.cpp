@@ -272,7 +272,7 @@ int myic_DESEncrypt(
 
 void deskey(unsigned char *key,short edf, unsigned long *kn)
 {
-    register int i, j, l, m, n;
+     int i, j, l, m, n;
     unsigned long pc1m[56],pcr[56];
 
 

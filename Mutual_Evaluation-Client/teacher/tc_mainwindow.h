@@ -1,3 +1,11 @@
+/*
+ * tc_mainwindow.h
+ * 1.简述：教师用户主界面窗口
+ * 2.主要功能：初始化用户数据，
+ * 3.被引用：login.cpp
+ */
+
+
 #ifndef TC_MAINWINDOW_H
 #define TC_MAINWINDOW_H
 
@@ -33,20 +41,10 @@ public:
     //设置发送给服务器的用户以及请求获取用户数据
     QByteArray set_user_data_json();
 
-    // 连接服务器保存修改后的个人信息
-    void save_personal_info_to_server();
-    //设置发送给服务器的用户个人信息数据
-    QByteArray set_personal_info_json();
-
-    // 连接服务器保存修改后的密码
-    void save_personal_pwd_to_server();
-    //设置发送给服务器的用户修改后的密码
-    QByteArray set_personal_pwd_json();
-    //为了返回给login.cpp的修改密码界面对象（因为需要在login.cpp对密码进行加密）
     Tc_Pwd* return_tc_pwd_window();
 
     //解析服务器发送过来的json数据包
-    void get_back_json(QByteArray back_buf, QString &service, QString &pwd, QString &name, QString &sex,
+    void get_user_data_back_json(QByteArray back_buf, QString &service, QString &msg, QString &pwd, QString &name, QString &sex,
                         QString &academy, QString &email, QString &tell, QString &qq, int &course_number,
                        bool &completed_info); //解析返回的json数据包
 

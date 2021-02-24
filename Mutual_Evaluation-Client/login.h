@@ -1,3 +1,11 @@
+/*
+ * login.h
+ * 1.简述：用户登录主界面
+ * 2.主要功能：登录，注册，服务器设置
+ * 3.被引用：main.h
+ */
+
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -27,17 +35,18 @@ public:
 
     // 设置登陆用户信息的json包
     QByteArray set_login_json(QString current_user, QString user, QString pwd);
+
     // 设置注册用户信息的json包
     QByteArray set_register_json(QString current_user, QString user,QString pwd);
 
-    //得到服务器处理登录后的返回码
-    QStringList get_login_status(QByteArray json);
+    //解析返回的json数据包
+    void get_back_json(QByteArray &back_buf, QString &sender,QString &msg);
 
-    void get_back_json(QByteArray &back_buf, QString &sender,QString &msg); //解析返回的json数据包
+    //得到当前请求登录的用户类别
+    QString get_login_current_user();
 
-    QString get_login_current_user();  //得到当前请求登录的用户类别
-    QString get_regist_current_user(); //得到当前请求注册的用户类别
-
+    //得到当前请求注册的用户类别
+    QString get_regist_current_user();
 
 protected: 
     void mouseMoveEvent(QMouseEvent *event);
@@ -45,9 +54,9 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
 private:
-    // 读取配置信息，设置默认登录状态，默认设置信息
-    //void readCfg();
-
+    //读取配置信息，设置默认登录状态，默认设置信息
+    void read_login_info();
+    void read_socket();
 
 private slots:
     void on_login_btn_clicked();

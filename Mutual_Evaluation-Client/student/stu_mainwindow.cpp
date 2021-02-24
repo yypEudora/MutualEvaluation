@@ -69,7 +69,8 @@ void Stu_Mainwindow::manage_signals()
     connect(m_stu_info, &Stu_Info::save_updated_info_to_server, [=]()
     {
         m_completed_info = true;
-        save_personal_info_to_server();
+        //修改类成员变量
+        m_stu_info->updated_info_return(m_name,m_sex,m_academy,m_grade,m_major,m_class,m_tell,m_qq, m_completed_info);
     });
 
     //个人信息界面返回到主界面
@@ -89,7 +90,8 @@ void Stu_Mainwindow::manage_signals()
     connect(m_stu_pwd, &Stu_Pwd::save_updated_pwd_to_server, [=]()
     {
         emit save_updated_pwd_to_server();
-        save_personal_pwd_to_server();
+        //修改类成员变量
+        m_stu_pwd->updated_pwd_return(m_password);
     });
 
     //修改密码界面返回到主界面
@@ -235,6 +237,7 @@ QByteArray Stu_Mainwindow::set_user_data_json()
 {
     QMap<QString, QVariant> login;
     login.insert("sender","student");            //用户类别
+    login.insert("module", "deal_stu_info");     //请求的相关处理模块
     login.insert("service","acquire_user_data"); //请求的服务
     login.insert("user",m_user);                 //请求服务的用户
     /*json数据如
@@ -245,111 +248,6 @@ QByteArray Stu_Mainwindow::set_user_data_json()
         }
     */
     QJsonDocument jsonDocument = QJsonDocument::fromVariant(login);
-    if(jsonDocument.isNull()){
-        cout << " jsonDocument.isNull() ";
-        return "";
-    }
-    return jsonDocument.toJson();
-}
-
-
-/**
- * @brief Stu_Mainwindow::save_personal_info_to_server 连接服务器保存修改后的个人信息
- */
-void Stu_Mainwindow::save_personal_info_to_server()
-{
-    //修改类成员变量
-    m_stu_info->updated_info_return(m_name,m_sex,m_academy,m_grade,m_major,m_class,m_tell,m_qq, m_completed_info);
-    QByteArray postData = set_personal_info_json();
-
-    this->m_tcpSocket = new QTcpSocket(this);
-    this->m_tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
-                                //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
-    this->m_tcpSocket->connectToHost(m_ip,8888);
-    connect(this->m_tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_messages()));
-    bool suc = this->m_tcpSocket->waitForConnected();
-    qDebug()<<suc;
-    this->m_tcpSocket->write(postData,postData.length());//发送保存个人信息到服务器数据包
-    qDebug()<<"发送保存个人信息数据包";
-}
-
-
-/**
- * @brief Stu_Mainwindow::set_personal_info_json 设置发送给服务器的用户个人信息数据
- * return 要发送给服务器的json数据包
- */
-QByteArray Stu_Mainwindow::set_personal_info_json()
-{
-    QMap<QString, QVariant> info;
-    info.insert("sender", "student");            //用户类别
-    info.insert("service", "save_personal_info_to_server"); //请求的服务
-    info.insert("user", m_user);                 //请求服务的用户
-    info.insert("name", m_name);
-    info.insert("sex", m_sex);
-    info.insert("academy", m_academy);
-    info.insert("grade", m_grade);
-    info.insert("major", m_major);
-    info.insert("class", m_class);
-    info.insert("tell", m_tell);
-    info.insert("qq", m_qq);
-    info.insert("completed_info", m_completed_info);
-    /*json数据如
-        {
-            sender:xxxx,
-            service:xxxx,
-            user:xxx
-            ...
-        }
-    */
-    QJsonDocument jsonDocument = QJsonDocument::fromVariant(info);
-    if(jsonDocument.isNull()){
-        cout << " jsonDocument.isNull() ";
-        return "";
-    }
-    return jsonDocument.toJson();
-}
-
-
-/**
- * @brief Stu_Mainwindow::save_personal_pwd_to_server 连接服务器保存修改后的密码
- */
-void Stu_Mainwindow::save_personal_pwd_to_server()
-{
-    //修改类成员变量
-    m_stu_pwd->updated_pwd_return(m_password);
-    QByteArray postData = set_personal_pwd_json();
-    this->m_tcpSocket = new QTcpSocket(this);
-    this->m_tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
-                                //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
-    this->m_tcpSocket->connectToHost(m_ip,8888);
-    connect(this->m_tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_messages()));
-    bool suc = this->m_tcpSocket->waitForConnected();
-    qDebug()<<suc;
-    this->m_tcpSocket->write(postData,postData.length());//发送保存个人信息到服务器数据包
-    qDebug()<<"发送保存密码数据包";
-}
-
-
-/**
- * @brief Stu_Mainwindow::set_personal_pwd_json 设置发送给服务器的用户修改后的密码
- * return 要发送给服务器的json数据包
- */
-QByteArray Stu_Mainwindow::set_personal_pwd_json()
-{
-    QMap<QString, QVariant> info;
-    info.insert("sender", "student");            //用户类别
-    info.insert("service", "save_personal_pwd_to_server"); //请求的服务
-    info.insert("user", m_user);                 //请求服务的用户
-    info.insert("pwd", m_password);
-    /*json数据如
-        {
-            sender:xxxx,
-            service:xxxx,
-            user:xxx
-            ...
-        }
-    */
-    QJsonDocument jsonDocument = QJsonDocument::fromVariant(info);
     if(jsonDocument.isNull()){
         cout << " jsonDocument.isNull() ";
         return "";
@@ -378,7 +276,8 @@ void Stu_Mainwindow::read_back_messages()
 
     //获取事件处理的返回信息
     QString service;
-    get_back_json(back_buf,service, m_password, m_name, m_sex, m_academy, m_grade, m_major, m_class, m_tell, m_qq, m_course_number, m_completed_info);
+    QString msg;
+    get_user_data_back_json(back_buf,service, msg, m_password, m_name, m_sex, m_academy, m_grade, m_major, m_class, m_tell, m_qq, m_course_number, m_completed_info);
     if(service == "acquire_user_data"){
         if(!m_completed_info){         //个人信息没有完善
             int choose;
@@ -397,15 +296,20 @@ void Stu_Mainwindow::read_back_messages()
             m_stu_info->show_mainwindow(m_password, m_name, m_sex, m_academy, m_grade, m_major, m_class, m_tell, m_qq, m_completed_info);
           }
         }
+        else if(msg=="false")   //用户数据初始化失败
+            QMessageBox::warning(this, tr("提示"),
+                                         QString(tr("用户数据初始化失败")),
+                                         QMessageBox::Yes | QMessageBox::No);
     }
+
 }
 
 
 /**
- * @brief Stu_Mainwindow::read_back_messages 解析服务器返回的用户数据json包
+ * @brief Stu_Mainwindow::get_user_data_back_json 解析服务器返回的用户数据json包
  * @param back_buf, service... 缓冲区以及需要解析出来的json包里的内容
  */
-void Stu_Mainwindow::get_back_json(QByteArray back_buf, QString &service, QString &pwd, QString &name, QString &sex,
+void Stu_Mainwindow::get_user_data_back_json(QByteArray back_buf, QString &service, QString &msg, QString &pwd, QString &name, QString &sex,
                     QString &academy, QString &grade, QString &major, QString &clas,
                                    QString &tell, QString &qq, int &course_number, bool &completed_info)
 {
@@ -425,6 +329,12 @@ void Stu_Mainwindow::get_back_json(QByteArray back_buf, QString &service, QStrin
                 QJsonValue value = object.value("service");  // 获取指定 key 对应的 value
                 if (value.isString()) {  // 判断 value 是否为字符串
                     service = value.toString();  // 将 value 转化为字符串
+                }
+            }
+            if (object.contains("msg")) {
+                QJsonValue value = object.value("msg");
+                if (value.isString()) {
+                    msg = value.toString();
                 }
             }
             if (object.contains("pwd")) {
@@ -498,7 +408,7 @@ void Stu_Mainwindow::get_back_json(QByteArray back_buf, QString &service, QStrin
 
         }
     }
-    qDebug()<<"返回的信息包："<<service<<" "<<pwd<<" "<<name;
+    qDebug()<<"初始化用户数据返回的信息包："<<service<<" "<<" "<<name;
 }
 
 void Stu_Mainwindow::mousePressEvent(QMouseEvent *event)

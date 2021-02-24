@@ -16,7 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     common/common.cpp \
-    common/des.cpp \
+    common/des.c \
     login.cpp \
     main.cpp \
     student/stu_info.cpp \
