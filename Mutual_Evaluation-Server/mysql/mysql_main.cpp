@@ -54,10 +54,9 @@ void MYSQL_Main::connect_mysql()
         m_database.setUserName("root");          //数据库用户名，与设置一致
         m_database.setPassword("root");    //数据库密码，与设置一致
     }
-    if(m_database.open()){
+    if(m_database.open())
         qDebug()<<"connect success!";
-    }
-    if(!m_database.open())
+    else
     {
         qDebug()<<"fail to connect mysql:"<<m_database.lastError().text();
         return;

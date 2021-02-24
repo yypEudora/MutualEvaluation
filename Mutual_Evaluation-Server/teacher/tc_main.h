@@ -20,10 +20,9 @@ public:
 
 
     //获取客户端请求的服务信息
-    void read_service_messages(QByteArray send_buf);
+    void read_module_messages(QByteArray send_buf);
     //解析客户端请求服务的json数据包
-    void get_service_json(QByteArray temp_buf, QString &service, QString &user, QString &pwd, QString &name, QString &sex,
-                          QString &academy, QString &email, QString &tell, QString &qq, bool &completed_info);
+    void get_module_json(QByteArray temp_buf, QString &module);
 
 private:
     Tc_Info_MYSQL m_info_mysql; //处理教师信息相关
