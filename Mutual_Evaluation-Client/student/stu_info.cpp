@@ -6,6 +6,9 @@
 #include <QStyle>
 #include <common/common.h>
 #include <QMessageBox>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include "stu_login_instance.h"
 
 Stu_Info::Stu_Info(QWidget *parent) :
     QWidget(parent),
@@ -38,6 +41,13 @@ void Stu_Info::show_mainwindow(QString pwd, QString name, QString sex, QString a
                                QString major, QString clas,QString tell, QString qq, bool completed_info)
 {
     this->show();
+
+    Stu_Login_Instance *login_instance = Stu_Login_Instance::getInstance(); //获取单例
+    m_user = login_instance->get_user();
+    m_ip = login_instance->get_ip();
+    m_port = login_instance->get_port();
+
+
     ui->stu_name_tx->setText(name);
     ui->stu_sex_tx->setText(sex);
     ui->stu_academy_tx->setText(academy);
@@ -98,11 +108,8 @@ void Stu_Info::manage_signals()
                                              QMessageBox::Yes | QMessageBox::No);
                 if (choose== QMessageBox::Yes)
                 {
-                  save_changed_info();
-                  QMessageBox::information(this, tr("提示"),
-                                        QString(tr("保存成功！")),
-                                        QMessageBox::Yes);
-                 }
+                    save_changed_info();
+                }
             }
         }
     });
@@ -119,9 +126,6 @@ void Stu_Info::manage_signals()
                 //判断个人信息的输入是否合法
                 if(check_info_valid()){
                     save_changed_info();
-                    QMessageBox::information(this, tr("提示"),
-                                            QString(tr("保存成功！")),
-                                            QMessageBox::Yes);
                 }
              }
             else                            //不保存修改，直接返回
@@ -250,8 +254,135 @@ void Stu_Info::save_changed_info()
     m_tell = this->ui->stu_tell_tx->text();
     m_qq = this->ui->stu_qq_tx->text();
     m_completed_info = true;
-    emit save_updated_info_to_server();
+
+    save_personal_info_to_server();
 }
+
+
+/**
+ * @brief Stu_Info::save_personal_info_to_server 连接服务器保存修改后的个人信息
+ */
+void Stu_Info::save_personal_info_to_server()
+{
+    //修改类成员变量
+    QByteArray postData = set_personal_info_json();
+
+    this->m_tcpSocket = new QTcpSocket(this);
+    this->m_tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
+                                //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
+    this->m_tcpSocket->connectToHost(m_ip,8888);
+    connect(this->m_tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_messages()));
+    bool suc = this->m_tcpSocket->waitForConnected();
+    qDebug()<<suc;
+    this->m_tcpSocket->write(postData,postData.length());//发送保存个人信息到服务器数据包
+    qDebug()<<"发送保存个人信息数据包";
+
+    emit save_updated_info_to_server(); //信号发送给stu_mainwindow.cpp
+}
+
+
+/**
+ * @brief Stu_Info::set_personal_info_json 设置发送给服务器的用户个人信息数据
+ * return 要发送给服务器的json数据包
+ */
+QByteArray Stu_Info::set_personal_info_json()
+{
+    QMap<QString, QVariant> info;
+    info.insert("sender", "student");            //用户类别
+    info.insert("module", "deal_stu_info");     //请求的相关处理模块
+    info.insert("service", "save_personal_info_to_server"); //请求的服务
+    info.insert("user", m_user);                 //请求服务的用户
+    info.insert("name", m_name);
+    info.insert("sex", m_sex);
+    info.insert("academy", m_academy);
+    info.insert("grade", m_grade);
+    info.insert("major", m_major);
+    info.insert("class", m_class);
+    info.insert("tell", m_tell);
+    info.insert("qq", m_qq);
+    info.insert("completed_info", m_completed_info);
+    /*json数据如
+        {
+            sender:xxxx,
+            service:xxxx,
+            user:xxx
+            ...
+        }
+    */
+    QJsonDocument jsonDocument = QJsonDocument::fromVariant(info);
+    if(jsonDocument.isNull()){
+        cout << " jsonDocument.isNull() ";
+        return "";
+    }
+    return jsonDocument.toJson();
+}
+
+
+
+/**
+ * @brief Stu_Info::read_back_messages 读取服务器返回的用户数据json包
+ */
+void Stu_Info::read_back_messages()
+{
+    QByteArray alldata = this->m_tcpSocket->readAll();
+    QByteArray back_buf = alldata;
+    qDebug()<<"back_buf:"<<back_buf;
+
+    //获取事件处理的返回信息
+    QString service;
+    QString msg;
+    get_back_json(back_buf,service, msg);
+    if(service == "save_personal_info_to_server"){
+        if(msg=="true"){
+            QMessageBox::information(this, tr("提示"),
+                                         QString(tr("保存成功！")),
+                                         QMessageBox::Yes);
+        }
+        else{
+            QMessageBox::warning(this, tr("提示"),
+                                         QString(tr("保存失败！")),
+                                         QMessageBox::Yes);
+        }
+    }
+}
+
+
+
+/**
+ * @brief Stu_Info::get_back_json 解析服务器返回的用户数据json包
+ * @param back_buf, service... 缓冲区以及需要解析出来的json包里的内容
+ */
+void Stu_Info::get_back_json(QByteArray back_buf, QString &service, QString &msg)
+{
+    /*json数据如下
+    {
+        service:xxxx
+        .....
+    }
+    */
+    //解析json包
+    QJsonParseError jsonError;
+    QJsonDocument doucment = QJsonDocument::fromJson(back_buf, &jsonError);  // 转化为 JSON 文档
+    if (!doucment.isNull() && (jsonError.error == QJsonParseError::NoError)) {  // 解析未发生错误
+        if (doucment.isObject()) { // JSON 文档为对象
+            QJsonObject object = doucment.object();  // 转化为对象
+            if (object.contains("service")) {  // 包含指定的 key
+                QJsonValue value = object.value("service");  // 获取指定 key 对应的 value
+                if (value.isString()) {  // 判断 value 是否为字符串
+                    service = value.toString();  // 将 value 转化为字符串
+                }
+            }
+            if (object.contains("msg")) {
+                QJsonValue value = object.value("msg");
+                if (value.isString()) {
+                    msg = value.toString();
+                }
+            }
+        }
+    }
+    qDebug()<<"保存个人信息返回的信息包："<<service<<" "<<msg;
+}
+
 
 
 /**

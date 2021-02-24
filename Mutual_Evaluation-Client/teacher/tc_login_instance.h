@@ -1,3 +1,11 @@
+/*
+ * tc_login_instance.h
+ * 1.简述：学生用户单例模式类
+ * 2.主要功能：设置/获取登录信息
+ * 3.被引用：teacher文件中的所有头文件
+ */
+
+
 #ifndef TC_LOGIN_INSTANCE_H
 #define TC_LOGIN_INSTANCE_H
 

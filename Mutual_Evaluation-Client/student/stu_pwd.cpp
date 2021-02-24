@@ -7,6 +7,9 @@
 #include <QCryptographicHash>
 #include <QMessageBox>
 #include "common/common.h"
+#include "stu_login_instance.h"
+#include <QJsonDocument>
+#include <QJsonObject>
 
 Stu_Pwd::Stu_Pwd(QWidget *parent) :
     QWidget(parent),
@@ -60,12 +63,11 @@ void Stu_Pwd::manage_signals()
             {
                 m_password = ui->stu_new_pwd_tx->text();
                 emit save_updated_pwd_to_server();
+                updated_pwd_return(m_password);
+                save_personal_pwd_to_server();
                 ui->stu_before_pwd_tx->clear();
                 ui->stu_new_pwd_tx->clear();
                 ui->stu_pwd_again_tx->clear();
-                QMessageBox::information(this, tr("提示"),
-                                    QString(tr("修改成功！")),
-                                    QMessageBox::Yes);
              }
         }
 
@@ -96,6 +98,10 @@ void Stu_Pwd::show_mainwindow(QString pwd)
 {
     this->show();
 
+    Stu_Login_Instance *login_instance = Stu_Login_Instance::getInstance(); //获取单例
+    m_user = login_instance->get_user();
+    m_ip = login_instance->get_ip();
+    m_port = login_instance->get_port();
     m_password = pwd;
 }
 
@@ -178,6 +184,125 @@ bool Stu_Pwd::check_before_pwd_correct()
         return false;
     return true;
 }
+
+
+
+
+/**
+ * @brief Stu_Pwd::save_personal_pwd_to_server 连接服务器保存修改后的密码
+ */
+void Stu_Pwd::save_personal_pwd_to_server()
+{
+    QByteArray postData = set_personal_pwd_json();
+    this->m_tcpSocket = new QTcpSocket(this);
+    this->m_tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
+                                //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
+    this->m_tcpSocket->connectToHost(m_ip,8888);
+    connect(this->m_tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_messages()));
+    bool suc = this->m_tcpSocket->waitForConnected();
+    qDebug()<<suc;
+    this->m_tcpSocket->write(postData,postData.length());//发送保存个人信息到服务器数据包
+    qDebug()<<"发送保存密码数据包";
+}
+
+
+
+
+/**
+ * @brief Stu_Pwd::set_personal_pwd_json 设置发送给服务器的用户修改后的密码
+ * return 要发送给服务器的json数据包
+ */
+QByteArray Stu_Pwd::set_personal_pwd_json()
+{
+    QMap<QString, QVariant> info;
+    info.insert("sender", "student");            //用户类别
+    info.insert("module", "deal_stu_info");     //请求的相关处理模块
+    info.insert("service", "save_personal_pwd_to_server"); //请求的服务
+    info.insert("user", m_user);                 //请求服务的用户
+    info.insert("pwd", m_password);
+    /*json数据如
+        {
+            sender:xxxx,
+            service:xxxx,
+            user:xxx
+            ...
+        }
+    */
+    QJsonDocument jsonDocument = QJsonDocument::fromVariant(info);
+    if(jsonDocument.isNull()){
+        cout << " jsonDocument.isNull() ";
+        return "";
+    }
+    return jsonDocument.toJson();
+}
+
+
+
+/**
+ * @brief Stu_Pwd::read_back_messages 读取服务器返回的用户数据json包
+ */
+void Stu_Pwd::read_back_messages()
+{
+    QByteArray alldata = this->m_tcpSocket->readAll();
+    QByteArray back_buf = alldata;
+    qDebug()<<"back_buf:"<<back_buf;
+
+    //获取事件处理的返回信息
+    QString service;
+    QString msg;
+    get_back_json(back_buf,service, msg);
+    if(service == "save_personal_pwd_to_server"){
+        if(msg=="true"){
+            QMessageBox::information(this, tr("提示"),
+                                         QString(tr("修改成功！")),
+                                         QMessageBox::Yes);
+        }
+        else{
+            QMessageBox::warning(this, tr("提示"),
+                                         QString(tr("修改失败！")),
+                                         QMessageBox::Yes);
+        }
+
+    }
+}
+
+
+
+/**
+ * @brief Stu_Pwd::get_back_json 解析服务器返回的用户数据json包
+ * @param back_buf, service... 缓冲区以及需要解析出来的json包里的内容
+ */
+void Stu_Pwd::get_back_json(QByteArray back_buf, QString &service, QString &msg)
+{
+    /*json数据如下
+    {
+        service:xxxx
+        .....
+    }
+    */
+    //解析json包
+    QJsonParseError jsonError;
+    QJsonDocument doucment = QJsonDocument::fromJson(back_buf, &jsonError);  // 转化为 JSON 文档
+    if (!doucment.isNull() && (jsonError.error == QJsonParseError::NoError)) {  // 解析未发生错误
+        if (doucment.isObject()) { // JSON 文档为对象
+            QJsonObject object = doucment.object();  // 转化为对象
+            if (object.contains("service")) {  // 包含指定的 key
+                QJsonValue value = object.value("service");  // 获取指定 key 对应的 value
+                if (value.isString()) {  // 判断 value 是否为字符串
+                    service = value.toString();  // 将 value 转化为字符串
+                }
+            }
+            if (object.contains("msg")) {
+                QJsonValue value = object.value("msg");
+                if (value.isString()) {
+                    msg = value.toString();
+                }
+            }
+        }
+    }
+    qDebug()<<"修改密码返回的信息包："<<service<<" "<<msg;
+}
+
 
 
 /**

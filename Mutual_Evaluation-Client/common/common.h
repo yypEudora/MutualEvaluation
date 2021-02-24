@@ -1,3 +1,11 @@
+/*
+ * common.h
+ * 1.简述：项目所需要的共同功能
+ * 2.主要功能：文本数据输入格式要求，登录时所需要的配置信息，信息加密
+ * 3.被引用：login.h
+ */
+
+
 #ifndef COMMON_H
 #define COMMON_H
 
@@ -9,9 +17,8 @@
 
 #define cout qDebug() << "[ " << __FILE__ << ":"  << __LINE__ << " ] "
 
-#define CONFFILE        "conf/cfg.json"     // 配置文件
-#define RECORDDIR       "conf/record/"      // 用户文件上传下载记录
-#define FILETYPEDIR     "conf/fileType"     // 存放文件类型图片目录
+
+#define SOCKET_CONF        "conf/socket.json"     // 配置文件
 
 // 正则表达式
 #define USER_REG        "^[a-zA-Z\\d_@#-\*]\{3,16\}$"
@@ -23,24 +30,6 @@
 #define IP_REG          "((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)"
 #define PORT_REG        "^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)"
 
-// 文件信息
-struct FileInfo
-{
-    QString md5;            // 文件md5码
-    QString filename;       // 文件名字
-    QString user;           // 用户
-    QString time;           // 上传时间
-    QString url;            // url
-    QString type;           // 文件类型
-    qint64 size;            // 文件大小
-    int shareStatus;        // 是否共享, 1共享， 0不共享
-    int pv;                 // 下载量
-    QListWidgetItem *item;  // list widget 的item
-};
-// 传输状态
-enum TransferStatus{Download, Uplaod, Recod};
-
-
 class Common : public QObject
 {
     Q_OBJECT
@@ -50,49 +39,31 @@ public:
     ~Common();
 
     // 窗口在屏幕中央显示
-    void moveToCenter(QWidget *tmp);
+    void move_to_center(QWidget *tmp);
 
     // 从配置文件中得到相对应的参数
-    QString getCfgValue(QString title, QString key, QString path = CONFFILE);
-
-    // 通过读取文件, 得到文件类型, 存放在typeList
-    void getFileTypeList();
-
-    // 得到文件后缀，参数为文件类型，函数内部判断是否有此类型，如果有，使用此类型，没有，使用other.png
-    QString getFileType(QString type);
+    QString get_cfg_value(QString title, QString key, QString path);
 
     // 登录信息，写入配置文件
-    void writeLoginInfo(QString user, QString pwd, bool isRemeber, QString path = CONFFILE);
+    void write_login_info(QString user, QString pwd, bool is_remeber, QString path);
 
     // 服务器信息，写入配置文件
-    void writeWebInfo(QString ip, QString port, QString path=CONFFILE);
+    void write_socket_info(QString ip, QString port, QString path=SOCKET_CONF);
 
     // 获取某个文件的md5码
-    QString getFileMd5(QString filePath);
+    QString get_file_md5(QString file_path);
 
     // 将某个字符串加密成md5码
-    QString getStrMd5(QString str = "");
+    QString get_str_md5(QString str = "");
 
     // 产生分隔线
-    QString getBoundary();
+    QString get_boundary();
 
-    // 得到服务器回复的状态码， 返回值为 "000", 或 "001"
-    QString getCode(QByteArray json);
+    //信息加密
+    QByteArray info_encrypt(QString str);
 
-    // 传输数据记录到本地文件，user：操作用户，name：操作的文件, code: 操作码， path: 文件保存的路径
-    void writeRecord(QString user, QString name, QString code, QString path = RECORDDIR);
-
-    // 得到http通信类对象
-    static QNetworkAccessManager* getNetManager();
-public:
-    static QStringList  m_typeList;
-
-private:
-    // 文件类型路径
-    static QString      m_typePath;
-    // 主要保存文件类型的后缀
-    // http类
-    static QNetworkAccessManager *m_netManager;
+    //信息解密
+    QString info_decode(QByteArray by);
 };
 
 #endif // COMMON_H

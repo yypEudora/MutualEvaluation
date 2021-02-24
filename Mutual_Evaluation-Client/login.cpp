@@ -14,9 +14,10 @@
 #include <QHostAddress>
 #include <QLoggingCategory>
 #include <QDebug>
+#include <QFileInfo>
 #include "student/stu_login_instance.h"
-#include "student/stu_pwd.h"
 #include "teacher/tc_login_instance.h"
+#include "common/common.h"
 
 Login::Login(QWidget *parent)
     : QDialog(parent)
@@ -39,6 +40,9 @@ Login::Login(QWidget *parent)
     ui->stackedWidget->setCurrentWidget(ui->login_page);
     setAutoFillBackground(true);
 
+    //居中显示
+    m_cm.move_to_center(this);
+
     //初始设置选择身份为学生
     ui->student_btn->setChecked(true);
 
@@ -52,6 +56,9 @@ Login::Login(QWidget *parent)
 
     //设置软件图标
     this->setWindowIconText("ME");
+
+    //读取socket_server信息
+    read_socket();
 }
 
 Login::~Login()
@@ -84,6 +91,7 @@ void Login::manage_signals()
 {
     //登录界面点击设置，进入服务器IP和端口界面
     connect(ui->set_btn,&QToolButton::clicked,[=](){
+        ui->ip_tx->setFocus();
         ui->stackedWidget->setCurrentWidget(ui->set_page);
     });
     //登录界面点击注册，进入注册界面
@@ -102,6 +110,7 @@ void Login::manage_signals()
     });
     //注册界面点击设置，进入设置界面
     connect(ui->set3_btn,&QToolButton::clicked,[=](){
+        ui->ip_tx->setFocus();
         ui->stackedWidget->setCurrentWidget(ui->set_page);
     });
     //设置界面点击返回，返回登录界面
@@ -147,7 +156,7 @@ void Login::manage_signals()
         Stu_Pwd* stu_pwd = m_stu_mainwindow->return_stu_pwd_window();
         QString pwd;
         stu_pwd->return_input_pwd(pwd);
-        stu_pwd->pwd_str_md5 = m_cm.getStrMd5(pwd);//加密
+        stu_pwd->pwd_str_md5 = m_cm.get_str_md5(pwd);//加密
     });
 
     //为学生修改密码界面输入的新密码进行加密
@@ -156,7 +165,7 @@ void Login::manage_signals()
         Stu_Pwd* stu_pwd = m_stu_mainwindow->return_stu_pwd_window();
         QString new_pwd;
         stu_pwd->return_input_new_pwd(new_pwd);
-        stu_pwd->new_pwd_str_md5 = m_cm.getStrMd5(new_pwd);//加密
+        stu_pwd->new_pwd_str_md5 = m_cm.get_str_md5(new_pwd);//加密
     });
 
     //为教师修改密码界面输入的原始密码进行加密
@@ -165,7 +174,7 @@ void Login::manage_signals()
         Tc_Pwd* tc_pwd = m_tc_mainwindow->return_tc_pwd_window();
         QString pwd;
         tc_pwd->return_input_pwd(pwd);
-        tc_pwd->pwd_str_md5 = m_cm.getStrMd5(pwd);//加密
+        tc_pwd->pwd_str_md5 = m_cm.get_str_md5(pwd);//加密
     });
 
     //为教师修改密码界面输入的新密码进行加密
@@ -174,11 +183,33 @@ void Login::manage_signals()
         Tc_Pwd* tc_pwd = m_tc_mainwindow->return_tc_pwd_window();
         QString new_pwd;
         tc_pwd->return_input_new_pwd(new_pwd);
-        tc_pwd->new_pwd_str_md5 = m_cm.getStrMd5(new_pwd);//加密
+        tc_pwd->new_pwd_str_md5 = m_cm.get_str_md5(new_pwd);//加密
+    });
+
+
+
+
+
+
+    //记住密码的用户名输入后，自动访问json获取密码
+    connect(ui->name_tx,&QLineEdit::editingFinished,[=](){
+        ui->name_tx->setText(ui->name_tx->text());
+        QString path = "conf/" + this->ui->name_tx->text() + ".json";
+        QFileInfo file_info(path);
+        if(file_info.isFile())
+            read_login_info();
+        else{
+            qDebug()<<"该文件不存在";
+            ui->pwd_tx->clear();
+            ui->remp_btn->setChecked(false);
+        }
     });
 }
 
-
+/**
+ * @brief Login::mousePressEvent  Login::mousePressEvent Login::mouseMoveEvent
+ * 窗口移动
+ */
 void Login::mousePressEvent(QMouseEvent *event)
 {
 //     如果是左键, 计算窗口左上角, 和当前按钮位置的距离
@@ -188,13 +219,11 @@ void Login::mousePressEvent(QMouseEvent *event)
         m_pt = event->pos();
     }
 }
-
 void Login::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
     m_bPressed = false;
 }
-
 void Login::mouseMoveEvent(QMouseEvent *event)
 {
     if(m_bPressed)
@@ -311,26 +340,24 @@ void Login::on_login_btn_clicked()
     QString ip = ui->ip_tx->text();
     QString port = ui->port_tx->text();
 
+
+    QString path = "conf/" + this->ui->name_tx->text() + ".json";
+
     //登录信息写入配置文件
-    //m_cm.writeLoginInfo(user,pwd,ui->rem_pwd->isChecked());
-    //qDebug()<<"write:::"<<user.toStdString().data()<<pwd.toStdString().data();
+    m_cm.write_login_info(user,pwd,ui->remp_btn->isChecked(),path);
+    qDebug()<<"write:::"<<user.toStdString().data()<<pwd.toStdString().data();
 
-//    //设置登录信息json包，MD5加密
-//    QByteArray array = setLoginJson(user,m_cm.getStrMd5(pwd));
+    QByteArray postData = set_login_json(current_user, user, m_cm.get_str_md5(pwd));
 
-
-    // 将用户输入的注册信息 -> json对象
-        QByteArray postData = set_login_json(current_user, user, m_cm.getStrMd5(pwd));
-
-        this->tcpSocket = new QTcpSocket(this);
-        this->tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
-                                    //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
-        this->tcpSocket->connectToHost(ip,8888);
-        connect(this->tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_message()));
-        bool suc = this->tcpSocket->waitForConnected();
-        qDebug()<<suc;
-        this->tcpSocket->write(postData,postData.length());//发送登录数据包
-        qDebug()<<"发送数据包";
+    this->tcpSocket = new QTcpSocket(this);
+    this->tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
+                                //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
+    this->tcpSocket->connectToHost(ip,8888);
+    connect(this->tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_message()));
+    bool suc = this->tcpSocket->waitForConnected();
+    qDebug()<<suc;
+    this->tcpSocket->write(postData,postData.length());//发送登录数据包
+    qDebug()<<"发送数据包";
 
 }
 
@@ -423,17 +450,17 @@ void Login::on_reg_btn_clicked()
 
 
     // 将用户输入的注册信息 -> json对象
-        QByteArray postData = set_register_json(current_user,user, m_cm.getStrMd5(firstPwd));
+    QByteArray postData = set_register_json(current_user,user, m_cm.get_str_md5(firstPwd));
 
-        this->tcpSocket = new QTcpSocket(this);
-        this->tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
-                                    //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
-        this->tcpSocket->connectToHost(ip,8888);
-        connect(this->tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_message()));
-        bool suc = this->tcpSocket->waitForConnected();
-        qDebug()<<suc;
-        this->tcpSocket->write(postData,postData.length());//发送登录数据包
-        qDebug()<<"发送数据包: "<<postData;
+    this->tcpSocket = new QTcpSocket(this);
+    this->tcpSocket->abort();//中止当前连接并重置套接字。与disconnectFromHost（）不同，
+                                //此函数会立即关闭套接字，丢弃写入缓冲区中的任何挂起的数据。
+    this->tcpSocket->connectToHost(ip,8888);
+    connect(this->tcpSocket,SIGNAL(readyRead()),this,SLOT(read_back_message()));
+    bool suc = this->tcpSocket->waitForConnected();
+    qDebug()<<suc;
+    this->tcpSocket->write(postData,postData.length());//发送登录数据包
+    qDebug()<<"发送数据包: "<<postData;
 }
 
 
@@ -443,6 +470,7 @@ void Login::on_reg_btn_clicked()
 
 void Login::on_set2_btn_clicked()
 {
+    QString path = SOCKET_CONF;
     QString ip = ui->ip_tx->text();
     QString port = ui->port_tx->text();
     QRegExp regexp(IP_REG);
@@ -458,9 +486,10 @@ void Login::on_set2_btn_clicked()
         QMessageBox::warning(this, "警告", "您输入的端口格式不正确, 请重新输入!");
         return;
     }
+    m_cm.write_socket_info(ip,port,path);
     // 跳转到登陆界面
     ui->stackedWidget->setCurrentWidget(ui->login_page);
-    //m_cm.writeWebInfo(ip,port);
+
 }
 
 
@@ -496,6 +525,20 @@ void Login::read_login_back_messages(QString msg)
 {
     qDebug()<<"msg2是："<<msg;
     if(msg == "true") {
+        // 从控件中取出用户输入的数据
+        QString user = ui->name_tx->text();
+        QString pwd = ui->pwd_tx->text();
+
+        QString ip = ui->ip_tx->text();
+        QString port = ui->port_tx->text();
+
+
+        QString path = "conf/" + this->ui->name_tx->text() + ".json";
+
+        //登录信息写入配置文件
+        m_cm.write_login_info(user,pwd,ui->remp_btn->isChecked(),path);
+        qDebug()<<"write:::"<<user.toStdString().data()<<pwd.toStdString().data();
+
         this->hide();
         QString current_user = get_login_current_user();
 
@@ -597,42 +640,53 @@ void Login::get_back_json(QByteArray &back_buf, QString &sender,QString &msg)
     qDebug()<<"返回的信息包："<<sender<<" "<<msg<<" ";
 }
 
-
-//获取登录返回码
-QStringList Login::get_login_status(QByteArray json)
+/**
+ * @brief Login::read_login_info 曾经登录选择记住密码的用户输入用户名后，密码自动弹出
+ *
+ */
+void Login::read_login_info()
 {
-    QJsonParseError error;
-    QStringList list;
-
-    // 将来源数据json转化为JsonDocument
-    // 由QByteArray对象构造一个QJsonDocument对象，用于我们的读写操作
-    QJsonDocument doc = QJsonDocument::fromJson(json, &error);
-    if (error.error == QJsonParseError::NoError)
+    QString path = "conf/" + this->ui->name_tx->text() + ".json";
+    QFile file(path);
+    if( false == file.open(QIODevice::ReadWrite) )
     {
-        if (doc.isNull() || doc.isEmpty())
-        {
-            qDebug() << "doc.isNull() || doc.isEmpty()";
-            return list;
-        }
-
-        if( doc.isObject() )
-        {
-            //取得最外层这个大对象
-            QJsonObject obj = doc.object();
-            qDebug() << "服务器返回的数据";
-            //状态码
-            list.append( obj.value( "code" ).toString() );
-            //登陆token
-            list.append( obj.value( "token" ).toString() );
-        }
-    }
-    else
-    {
-        qDebug() << "err = " << error.errorString().toStdString().data();
+        cout << "file open err";
+        return;
     }
 
-    return list;
+    QString user_name = ui->name_tx->text();
+    QString user_pwd = m_cm.get_cfg_value("login","pwd",path);
+    QString remeber = m_cm.get_cfg_value("login", "remember",path);
+
+    qDebug() << "密码" << user_pwd;
+
+    if(remeber == "yes")//记住密码
+    {
+        QByteArray pwd = user_pwd.toLatin1();
+        QString password = m_cm.info_decode(pwd);
+        ui->pwd_tx->setText(password);
+        ui->remp_btn->setChecked(true);
+
+    }
+    else //没有记住密码
+    {
+        ui->pwd_tx->clear();
+        ui->remp_btn->setChecked(false);
+    }
+
+    ui->name_tx->setText(user_name);
 
 }
 
-
+/**
+ * @brief Login::read_read_socket 服务器信息自动导入
+ *
+ */
+void Login::read_socket()
+{
+    QString path = SOCKET_CONF;
+    QString server_ip = m_cm.get_cfg_value("socket_server","ip",path);
+    QString server_port = m_cm.get_cfg_value("socket_server","port",path);
+    ui->ip_tx->setText(server_ip);
+    ui->port_tx->setText(server_port);
+}
