@@ -39,10 +39,9 @@ void Tc_Info_MYSQL::connect_mysql()
         m_database.setUserName("root");          //数据库用户名，与设置一致
         m_database.setPassword("root");    //数据库密码，与设置一致
     }
-    if(m_database.open()){
+    if(m_database.open())
         qDebug()<<"connect success!";
-    }
-    if(!m_database.open())
+    else
     {
         qDebug()<<"fail to connect mysql:"<<m_database.lastError().text();
         return;
@@ -53,8 +52,9 @@ void Tc_Info_MYSQL::connect_mysql()
 /**
  * @brief Tc_Info_MYSQL::init_tc_data 用于教师用户登录后初始化用户的数据
  * @param user... 欲查询的用户的个人数据
+ * @return 返回true表示初始化成功，否则表示失败
  */
-void Tc_Info_MYSQL::init_tc_data(QString user, QString &pwd, QString &name, QString &sex,
+bool Tc_Info_MYSQL::init_tc_data(QString user, QString &pwd, QString &name, QString &sex,
                          QString &academy, QString &email, QString &tell, QString &qq,
                          int &course_number, bool &completed_info)
 {
@@ -67,6 +67,11 @@ void Tc_Info_MYSQL::init_tc_data(QString user, QString &pwd, QString &name, QStr
 
     qDebug()<<"命令是" << cmd;
     query.exec(cmd);
+    if(!query.exec())
+    {
+        qDebug() << "Error: Fail to insert in [Mutual_Evaluation].[Student_Info]." << query.lastError();
+        return false;
+    }
     QString if_completed; //数据表中此字段是vchar类型
     while(query.next()) {
         pwd = query.value(1).toString();
@@ -83,15 +88,17 @@ void Tc_Info_MYSQL::init_tc_data(QString user, QString &pwd, QString &name, QStr
         else
             completed_info = false;
     }
+    return true;
 }
 
 
 /**
  * @brief Tc_Info_MYSQL::save_tc_info 将教师用户修改过后的个人信息写到服务器
  * @param user... 欲保存的用户的个人数据
+ * @return 返回true表示保存成功，否则表示失败
  */
 //测试使用，数据库命令需要改进
-void Tc_Info_MYSQL::save_tc_info(QString user, QString name, QString sex, QString academy,
+bool Tc_Info_MYSQL::save_tc_info(QString user, QString name, QString sex, QString academy,
                          QString email, QString tell, QString qq)
 {
     connect_mysql();
@@ -126,6 +133,12 @@ void Tc_Info_MYSQL::save_tc_info(QString user, QString name, QString sex, QStrin
     query.exec(cmd4);
     query.exec(cmd5);
     query.exec(cmd6);
+    if(!query.exec())
+    {
+        qDebug() << "Error: Fail to insert in [Mutual_Evaluation].[Student_Info]." << query.lastError();
+        return false;
+    }
+    return true;
 }
 
 
@@ -133,8 +146,9 @@ void Tc_Info_MYSQL::save_tc_info(QString user, QString name, QString sex, QStrin
 /**
  * @brief Tc_Info_MYSQL::save_tc_pwd 将教师用户修改过后的密码写到服务器
  * @param user, pwd 欲保存的用户的密码
+ * @return 返回true表示修改成功，否则表示失败
  */
-void Tc_Info_MYSQL::save_tc_pwd(QString user, QString pwd)
+bool Tc_Info_MYSQL::save_tc_pwd(QString user, QString pwd)
 {
     connect_mysql();
     QSqlQuery query(m_database);
@@ -144,4 +158,10 @@ void Tc_Info_MYSQL::save_tc_pwd(QString user, QString pwd)
 
     qDebug()<<"命令是" << cmd;
     query.exec(cmd);
+    if(!query.exec())
+    {
+        qDebug() << "Error: Fail to insert in [Mutual_Evaluation].[Student_Info]." << query.lastError();
+        return false;
+    }
+    return true;
 }

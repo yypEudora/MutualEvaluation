@@ -20,16 +20,16 @@ public:
     void connect_mysql(); //连接数据库
 
     //用于教师用户登录后初始化用户的数据
-    void init_tc_data(QString user, QString &pwd, QString &name, QString &sex,
+    bool init_tc_data(QString user, QString &pwd, QString &name, QString &sex,
                         QString &academy, QString &email, QString &tell, QString &qq,
                         int &course_number, bool &completed_info);
 
     //将教师用户修改过后的个人信息写到服务器
-    void save_tc_info(QString user, QString name, QString sex, QString academy,
+    bool save_tc_info(QString user, QString name, QString sex, QString academy,
                       QString email, QString tell, QString qq);
 
     //将修改过后的密码写到服务器
-    void save_tc_pwd(QString user, QString pwd);
+    bool save_tc_pwd(QString user, QString pwd);
 
 
 private:

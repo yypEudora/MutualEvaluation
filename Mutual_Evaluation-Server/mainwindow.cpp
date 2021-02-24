@@ -160,7 +160,7 @@ void MainWindow::read_regist_messages(QByteArray send_buf, QString current_user)
  */
 void MainWindow::read_student_messages(QByteArray send_buf){
     Stu_Main stu_main{m_tcpSocket};
-    stu_main.read_service_messages(send_buf);
+    stu_main.read_module_messages(send_buf);
 }
 
 
@@ -170,7 +170,7 @@ void MainWindow::read_student_messages(QByteArray send_buf){
  */
 void MainWindow::read_teacher_messages(QByteArray send_buf){
     Tc_Main tc_main{m_tcpSocket};
-    tc_main.read_service_messages(send_buf);
+    tc_main.read_module_messages(send_buf);
 }
 
 
